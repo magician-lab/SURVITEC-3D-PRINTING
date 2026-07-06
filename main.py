@@ -180,22 +180,53 @@ def system_login():
 
 
 
+
 def system_admin_required(f):
+
     @wraps(f)
     def wrapper(*args, **kwargs):
 
-        system = session.get("system")
+        # ---------------------------------------
+        # CHECK SESSION
+        # ---------------------------------------
+        admin_id = session.get("system_admin_id")
 
-        if not system:
-            flash("Please log in as a system administrator.", "warning")
-            return redirect(url_for("system_login"))
+        if admin_id is None:
 
-        admin = SystemAdmin.query.get(system["admin_id"])
+            flash(
+                "Please login as System Administrator.",
+                "warning"
+            )
 
-        if not admin:
-            session.pop("system", None)
-            flash("Your session has expired.", "warning")
-            return redirect(url_for("system_login"))
+            return redirect(
+                url_for("system_login")
+            )
+
+        # ---------------------------------------
+        # VERIFY ADMIN STILL EXISTS
+        # ---------------------------------------
+        admin = SystemAdmin.query.get(admin_id)
+
+        if admin is None:
+
+            # Remove only system session
+            session.pop("system_admin_id", None)
+            session.pop("system_admin_logged_in", None)
+
+            flash(
+                "Your session has expired. Please login again.",
+                "warning"
+            )
+
+            return redirect(
+                url_for("system_login")
+            )
+
+        # ---------------------------------------
+        # OPTIONAL:
+        # Make admin available in the route
+        # ---------------------------------------
+        # g.system_admin = admin
 
         return f(*args, **kwargs)
 
