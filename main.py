@@ -123,34 +123,56 @@ app.config['MAIL_DEFAULT_SENDER'] = 'SURVITEC 3D <magicdevelopers9@gmail.com>'
 mail = Mail(app)
 
 
-from flask import request, session, redirect, url_for, flash, render_template
-from werkzeug.security import check_password_hash
-
 @app.route("/system/login", methods=["GET", "POST"])
 def system_login():
+
+    # -----------------------------------
+    # ALREADY LOGGED IN?
+    # -----------------------------------
+    if session.get("system_admin_id"):
+        return redirect(url_for("manage_schools"))
 
     if request.method == "POST":
 
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
+        if not username or not password:
+            flash("Username and password are required.", "warning")
+            return render_template("login.html")
+
+        # -----------------------------------
+        # FIND ADMIN
+        # -----------------------------------
         admin = SystemAdmin.query.filter_by(
             username=username
         ).first()
 
-        if not admin:
-            flash("Invalid credentials.", "danger")
-            return redirect(url_for("system_login"))
+        if admin is None:
+            flash("Invalid username or password.", "danger")
+            return render_template("login.html")
 
+        # -----------------------------------
+        # VERIFY PASSWORD
+        # -----------------------------------
         if not check_password_hash(admin.password, password):
-            flash("Invalid credentials.", "danger")
-            return redirect(url_for("system_login"))
+            flash("Invalid username or password.", "danger")
+            return render_template("login.html")
 
-        # ONLY CREATE SYSTEM SESSION
+        # -----------------------------------
+        # CREATE SYSTEM SESSION
+        # -----------------------------------
         session["system_admin_id"] = admin.id
         session["system_admin_logged_in"] = True
 
-        flash("System login successful.", "success")
+        # Optional but recommended
+        session.permanent = True
+        session.modified = True
+
+        # Debug (remove later)
+        print("SYSTEM LOGIN SESSION:", dict(session))
+
+        flash("Welcome back!", "success")
 
         return redirect(url_for("manage_schools"))
 
