@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+
+Material Management
+
+</title>
+
+<style>
+/*======================================================
+DRAG & DROP
+======================================================*/
+
+.drop-area{
+
+    border:3px dashed #3b82f6;
+
+    border-radius:12px;
+
+    background:#f8fbff;
+
+    padding:45px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    transition:.35s;
+
+}
+
+.drop-area:hover{
+
+    background:#eef6ff;
+
+    border-color:#2563eb;
+
+}
+
+.drop-area.dragover{
+
+    background:#dbeafe;
+
+    border-color:#1d4ed8;
+
+    transform:scale(1.01);
+
+}
+
+.upload-icon{
+
+    font-size:55px;
+
+    margin-bottom:12px;
+
+}
+
+.drop-content h3{
+
+    color:#1e3a8a;
+
+    margin-bottom:10px;
+
+}
+
+.drop-content p{
+
+    color:#666;
+
+    margin-bottom:20px;
+
+}
+
+.browse-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 24px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.browse-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+/*======================================================
+FILE PREVIEW
+======================================================*/
+
+#filePreview{
+
+    display:none;
+
+    margin-top:20px;
+
+    background:white;
+
+    border-radius:10px;
+
+    border:1px solid #ddd;
+
+    padding:15px;
+
+}
+
+.preview-card{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+}
+
+.preview-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.preview-icon{
+
+    font-size:42px;
+
+}
+
+.preview-name{
+
+    font-weight:bold;
+
+}
+
+.preview-size{
+
+    color:#777;
+
+    font-size:14px;
+
+}
+
+.remove-file{
+
+    background:#ef4444;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 18px;
+
+    border-radius:7px;
+
+    cursor:pointer;
+
+}
+
+.remove-file:hover{
+
+    background:#dc2626;
+
+}
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+body{
+
+    background:#f5f7fb;
+
+    font-family:Segoe UI,Arial,sans-serif;
+
+    color:#333;
+
+}
+
+/*================================================*/
+
+.container{
+
+    width:95%;
+
+    max-width:1500px;
+
+    margin:25px auto;
+
+}
+
+/*================================================*/
+
+.header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.header h1{
+
+    color:#1f2937;
+
+}
+
+.back{
+
+    background:#374151;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:10px 18px;
+
+    border-radius:6px;
+
+}
+
+.back:hover{
+
+    background:#1f2937;
+
+}
+
+/*================================================*/
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+    margin-bottom:25px;
+
+}
+
+.card{
+
+    background:white;
+
+    border-radius:10px;
+
+    padding:20px;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+
+}
+
+.card h2{
+
+    color:#2563eb;
+
+    margin-bottom:10px;
+
+}
+
+.card span{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+}
+
+/*================================================*/
+
+.flash{
+
+    margin-bottom:20px;
+
+}
+
+.flash p{
+
+    padding:12px;
+
+    border-radius:6px;
+
+    margin-bottom:10px;
+
+}
+
+.success{
+
+    background:#d1fae5;
+
+    color:#065f46;
+
+}
+
+.error{
+
+    background:#fee2e2;
+
+    color:#991b1b;
+
+}
+
+/*================================================*/
+
+.section{
+
+    background:white;
+
+    border-radius:10px;
+
+    padding:25px;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+
+    margin-bottom:30px;
+
+}
+
+.section h2{
+
+    margin-bottom:20px;
+
+    color:#1e3a8a;
+
+}
+
+/*================================================*/
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+    gap:20px;
+
+}
+
+.input-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.input-group label{
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+input[type=text],
+
+textarea,
+
+select{
+
+    padding:12px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:6px;
+
+    outline:none;
+
+    transition:.3s;
+
+}
+
+textarea{
+
+    resize:vertical;
+
+    min-height:120px;
+
+}
+
+input:focus,
+
+textarea:focus,
+
+select:focus{
+
+    border-color:#2563eb;
+
+}
+
+/*================================================*/
+
+.file-upload{
+
+    border:2px dashed #94a3b8;
+
+    padding:30px;
+
+    border-radius:8px;
+
+    text-align:center;
+
+    background:#f8fafc;
+
+}
+
+.file-upload:hover{
+
+    border-color:#2563eb;
+
+}
+
+.file-upload input{
+
+    margin-top:15px;
+
+}
+
+/*================================================*/
+
+.school-box{
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    padding:15px;
+
+    height:320px;
+
+    overflow:auto;
+
+}
+
+.school-box input[type=text]{
+
+    width:100%;
+
+    margin-bottom:15px;
+
+}
+
+.school-item{
+
+    padding:8px;
+
+    border-bottom:1px solid #eee;
+
+}
+
+.school-item:hover{
+
+    background:#f3f4f6;
+
+}
+
+.school-item label{
+
+    cursor:pointer;
+
+}
+
+/*================================================*/
+
+.toggle{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-top:20px;
+
+}
+
+.toggle input{
+
+    width:20px;
+
+    height:20px;
+
+}
+
+/*================================================*/
+
+.upload-btn{
+
+    margin-top:25px;
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:15px;
+
+    width:100%;
+
+    border-radius:7px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+.upload-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+/*================================================*/
+
+@media(max-width:900px){
+
+.header{
+
+flex-direction:column;
+
+gap:15px;
+
+}
+
+}
+/*=====================================================
+MODALS
+======================================================*/
+
+.modal{
+
+    display:none;
+
+    position:fixed;
+
+    left:0;
+
+    top:0;
+
+    width:100%;
+
+    height:100%;
+
+    background:rgba(0,0,0,.55);
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+    animation:fadeIn .25s;
+
+}
+
+.modal-content{
+
+    background:white;
+
+    width:90%;
+
+    max-width:700px;
+
+    border-radius:12px;
+
+    padding:25px;
+
+    position:relative;
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    animation:slideUp .25s;
+
+}
+
+.close{
+
+    position:absolute;
+
+    right:20px;
+
+    top:15px;
+
+    font-size:30px;
+
+    cursor:pointer;
+
+    color:#777;
+
+}
+
+.close:hover{
+
+    color:red;
+
+}
+
+.modal-title{
+
+    margin-bottom:20px;
+
+    color:#1d4ed8;
+
+}
+
+.info-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    border-bottom:1px solid #eee;
+
+    padding:12px 0;
+
+    flex-wrap:wrap;
+
+}
+
+.info-label{
+
+    font-weight:bold;
+
+    color:#374151;
+
+}
+
+.info-value{
+
+    color:#444;
+
+}
+
+.school-pill{
+
+    display:inline-block;
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+    padding:8px 12px;
+
+    margin:4px;
+
+    border-radius:30px;
+
+    font-size:14px;
+
+}
+
+.view-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.schools-btn{
+
+    background:#059669;
+
+    color:white;
+
+}
+
+.edit-btn{
+
+    background:#f59e0b;
+
+    color:white;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+}
+
+to{
+
+opacity:1;
+
+}
+
+}
+
+@keyframes slideUp{
+
+from{
+
+transform:translateY(40px);
+
+opacity:0;
+
+}
+
+to{
+
+transform:translateY(0);
+
+opacity:1;
+
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!--===========================================-->
+
+<div class="header">
+
+<h1>
+
+📚 Material Management
+
+</h1>
+
+<a
+href="/schools"
+class="back">
+
+← Dashboard
+
+</a>
+
+</div>
+
+<!--===========================================-->
+
+<div class="cards">
+
+<div class="card">
+
+<h2>Total Materials</h2>
+
+<span>
+
+{{ total_materials }}
+
+</span>
+
+</div>
+
+<div class="card">
+
+<h2>Active</h2>
+
+<span>
+
+{{ active_materials }}
+
+</span>
+
+</div>
+
+<div class="card">
+
+<h2>Inactive</h2>
+
+<span>
+
+{{ inactive_materials }}
+
+</span>
+
+</div>
+
+<div class="card">
+
+<h2>Schools</h2>
+
+<span>
+
+{{ schools|length }}
+
+</span>
+
+</div>
+
+</div>
+
+<!--===========================================-->
+
+{% with messages=get_flashed_messages(with_categories=true) %}
+
+{% if messages %}
+
+<div class="flash">
+
+{% for category,message in messages %}
+
+<p class="{{category}}">
+
+{{message}}
+
+</p>
+
+{% endfor %}
+
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+<!--===========================================-->
+
+<div class="section">
+
+<h2>
+
+Upload New Material
+
+</h2>
+
+<form
+
+method="POST"
+
+enctype="multipart/form-data"
+
+>
+
+<div class="form-grid">
+
+<div class="input-group">
+
+<label>
+
+Material Title
+
+</label>
+
+<input
+
+type="text"
+
+name="title"
+
+required
+
+>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Subject
+
+</label>
+
+<select
+
+name="subject"
+
+required
+
+>
+
+<option value="">
+
+Select Subject
+
+</option>
+
+<option>Mathematics</option>
+
+<option>English</option>
+
+<option>Kiswahili</option>
+
+<option>Biology</option>
+
+<option>Chemistry</option>
+
+<option>Physics</option>
+
+<option>History</option>
+
+<option>Geography</option>
+
+<option>CRE</option>
+
+<option>Business Studies</option>
+
+<option>Computer Studies</option>
+
+<option>Agriculture</option>
+
+</select>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Grade
+
+</label>
+
+<select
+
+name="grade"
+
+required
+
+>
+
+<option value="">
+
+Select Grade
+
+</option>
+
+
+<option>PRIMARY</option>
+<option>SECONDARY</option>
+<option>TERTIARY</option>
+
+
+
+</select>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Description
+
+</label>
+
+<textarea
+
+name="description"
+
+></textarea>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Choose File
+
+</label>
+
+<div class="input-group">
+
+    <label>
+
+        Upload Material
+
+    </label>
+
+    <div id="dropArea" class="drop-area">
+
+        <div class="drop-content">
+
+            <div class="upload-icon">
+
+                ☁️
+
+            </div>
+
+            <h3>
+
+                Drag & Drop File Here
+
+            </h3>
+
+            <p>
+
+                or click to browse
+
+            </p>
+
+            <input
+
+                type="file"
+
+                id="fileInput"
+
+                name="file"
+
+                hidden
+
+                required
+
+            >
+
+            <button
+
+                type="button"
+
+                id="browseBtn"
+
+                class="browse-btn"
+
+            >
+
+                Browse File
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="filePreview"></div>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Assign Schools
+
+</label>
+
+<div class="school-box">
+
+<input
+
+type="text"
+
+id="schoolSearch"
+
+placeholder="Search school..."
+
+>
+
+<div id="schoolList">
+
+{% for school in schools %}
+
+<div
+
+class="school-item"
+
+>
+
+<label>
+
+<input
+
+type="checkbox"
+
+name="schools"
+
+value="{{school.id}}"
+
+>
+
+{{school.name}}
+
+</label>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="toggle">
+
+<input
+
+type="checkbox"
+
+name="active"
+
+checked
+
+>
+
+<label>
+
+Activate Immediately
+
+</label>
+
+</div>
+
+<button
+
+class="upload-btn"
+
+type="submit"
+
+>
+
+⬆ Upload Material
+
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+const search=document.getElementById("schoolSearch");
+
+search.addEventListener("keyup",function(){
+
+let value=this.value.toLowerCase();
+
+let schools=document.querySelectorAll(".school-item");
+
+schools.forEach(function(item){
+
+item.style.display=item.innerText.toLowerCase().includes(value)
+
+?
+
+"block"
+
+:
+
+"none";
+
+});
+
+});
+
+</script>
+
+<!--=====================================================
+MATERIALS LIST
+======================================================-->
+
+<div class="section">
+
+    <div
+        style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:15px;
+        margin-bottom:20px;
+    ">
+
+        <h2>
+
+            Uploaded Materials
+
+        </h2>
+
+        <input
+
+            type="text"
+
+            id="materialSearch"
+
+            placeholder="🔍 Search materials..."
+
+            style="
+                width:320px;
+                max-width:100%;
+                padding:12px;
+                border:1px solid #ccc;
+                border-radius:8px;
+            "
+
+        >
+
+    </div>
+
+    <div style="overflow-x:auto;">
+
+        <table
+            id="materialsTable"
+            style="
+                width:100%;
+                border-collapse:collapse;
+            "
+        >
+
+            <thead>
+
+                <tr
+                    style="
+                        background:#1e40af;
+                        color:white;
+                    "
+                >
+
+                    <th style="padding:14px;">#</th>
+
+                    <th>Title</th>
+
+                    <th>Subject</th>
+
+                    <th>Grade</th>
+
+                    <th>File</th>
+
+                    <th>Schools</th>
+
+                    <th>Status</th>
+
+                    <th>Uploaded</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for material in materials %}
+
+                <tr
+                    class="materialRow"
+                    style="
+                        border-bottom:1px solid #eee;
+                    "
+                >
+
+                    <td
+                        style="padding:12px;"
+                    >
+
+                        {{ loop.index }}
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            {{ material.title }}
+
+                        </strong>
+
+                    </td>
+
+                    <td>
+
+                        {{ material.subject }}
+
+                    </td>
+
+                    <td>
+
+                        {{ material.grade }}
+
+                    </td>
+
+                    <td>
+
+                        {% if material.file_name.endswith(".pdf") %}
+
+                            <span
+                                style="
+                                    background:#dc2626;
+                                    color:white;
+                                    padding:4px 10px;
+                                    border-radius:20px;
+                                    font-size:13px;
+                                "
+                            >
+
+                                PDF
+
+                            </span>
+
+                        {% elif material.file_name.endswith(".doc") or material.file_name.endswith(".docx") %}
+
+                            <span
+                                style="
+                                    background:#2563eb;
+                                    color:white;
+                                    padding:4px 10px;
+                                    border-radius:20px;
+                                    font-size:13px;
+                                "
+                            >
+
+                                WORD
+
+                            </span>
+
+                        {% elif material.file_name.endswith(".ppt") or material.file_name.endswith(".pptx") %}
+
+                            <span
+                                style="
+                                    background:#ea580c;
+                                    color:white;
+                                    padding:4px 10px;
+                                    border-radius:20px;
+                                    font-size:13px;
+                                "
+                            >
+
+                                PPT
+
+                            </span>
+
+                        {% elif material.file_name.endswith(".zip") %}
+
+                            <span
+                                style="
+                                    background:#6b7280;
+                                    color:white;
+                                    padding:4px 10px;
+                                    border-radius:20px;
+                                "
+                            >
+
+                                ZIP
+
+                            </span>
+
+                        {% elif material.file_name.endswith(".mp4") %}
+
+                            <span
+                                style="
+                                    background:#059669;
+                                    color:white;
+                                    padding:4px 10px;
+                                    border-radius:20px;
+                                "
+                            >
+
+                                VIDEO
+
+                            </span>
+
+                        {% else %}
+
+                            <span
+                                style="
+                                    background:#7c3aed;
+                                    color:white;
+                                    padding:4px 10px;
+                                    border-radius:20px;
+                                "
+                            >
+
+                                FILE
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {{ material.assigned_schools|length }}
+
+                        Schools
+
+                    </td>
+
+                    <td>
+
+                        {% if material.active %}
+
+                            <span
+                                style="
+                                    background:#10b981;
+                                    color:white;
+                                    padding:5px 12px;
+                                    border-radius:20px;
+                                    font-size:13px;
+                                "
+                            >
+
+                                Active
+
+                            </span>
+
+                        {% else %}
+
+                            <span
+                                style="
+                                    background:#ef4444;
+                                    color:white;
+                                    padding:5px 12px;
+                                    border-radius:20px;
+                                    font-size:13px;
+                                "
+                            >
+
+                                Inactive
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {{ material.uploaded_at.strftime("%d %b %Y") }}
+
+                    </td>
+
+                <td>
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:8px;
+                            flex-wrap:wrap;
+                            justify-content:center;
+                            align-items:center;
+                        "
+                    >
+
+                        <!-- TOGGLE -->
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('toggle_material', id=material.id) }}"
+                        >
+
+                            <button
+                                type="submit"
+                                style="
+                                    background:{% if material.active %}#dc2626{% else %}#10b981{% endif %};
+                                    color:white;
+                                    border:none;
+                                    padding:8px 14px;
+                                    border-radius:6px;
+                                    cursor:pointer;
+                                    font-weight:600;
+                                "
+                            >
+
+                                {% if material.active %}
+                                    Disable
+                                {% else %}
+                                    Enable
+                                {% endif %}
+
+                            </button>
+
+                        </form>
+
+                        <!-- DOWNLOAD -->
+
+                        <a
+                            href="{{ url_for('download_material', id=material.id) }}"
+                            class="btn download-btn"
+                        >
+                            ⬇ Download
+                        </a>
+
+                        <!-- VIEW -->
+
+                        <button
+                            type="button"
+                            class="btn view-btn"
+                            onclick="viewMaterial(
+                                '{{ material.title|escape }}',
+                                '{{ material.subject|escape }}',
+                                '{{ material.grade|escape }}',
+                                '{{ material.file_name|escape }}',
+                                '{{ material.uploaded_at.strftime('%d %b %Y') if material.uploaded_at else '' }}',
+                                `{{ material.description or '' }}`
+                            )"
+                        >
+                            👁 View
+                        </button>
+
+                        <!-- ASSIGNED SCHOOLS -->
+
+                        <button
+                            type="button"
+                            class="btn schools-btn"
+                            onclick="openSchoolsModal({{ material.id }})"
+                        >
+                            🏫 Schools
+                        </button>
+
+                        <!-- EDIT -->
+
+                        <button
+                            type="button"
+                            class="btn edit-btn"
+                            onclick="openEditMaterialModal({{ material.id }})"
+                        >
+                            ✏ Edit
+                        </button>
+
+                        <!-- DELETE -->
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('delete_material', id=material.id) }}"
+                            onsubmit="return confirm('Delete this material permanently?');"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn delete-btn"
+                            >
+                                🗑 Delete
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!--=====================================================
+LIVE SEARCH
+======================================================-->
+
+<script>
+
+const materialSearch = document.getElementById("materialSearch");
+
+materialSearch.addEventListener("keyup", function(){
+
+    let value = this.value.toLowerCase();
+
+    let rows = document.querySelectorAll(".materialRow");
+
+    rows.forEach(function(row){
+
+        row.style.display = row.innerText.toLowerCase().includes(value)
+
+            ? ""
+
+            : "none";
+
+    });
+
+});
+
+</script>
+<script>
+
+const dropArea=document.getElementById("dropArea");
+
+const fileInput=document.getElementById("fileInput");
+
+const browseBtn=document.getElementById("browseBtn");
+
+const preview=document.getElementById("filePreview");
+
+browseBtn.onclick=()=>{
+
+    fileInput.click();
+
+};
+
+dropArea.onclick=()=>{
+
+    fileInput.click();
+
+};
+
+dropArea.addEventListener("dragover",(e)=>{
+
+    e.preventDefault();
+
+    dropArea.classList.add("dragover");
+
+});
+
+dropArea.addEventListener("dragleave",()=>{
+
+    dropArea.classList.remove("dragover");
+
+});
+
+dropArea.addEventListener("drop",(e)=>{
+
+    e.preventDefault();
+
+    dropArea.classList.remove("dragover");
+
+    fileInput.files=e.dataTransfer.files;
+
+    showPreview();
+
+});
+
+fileInput.addEventListener("change",showPreview);
+
+function showPreview(){
+
+    if(fileInput.files.length===0){
+
+        preview.style.display="none";
+
+        return;
+
+    }
+
+    let file=fileInput.files[0];
+
+    let size=(file.size/1024/1024).toFixed(2);
+
+    let icon="📄";
+
+    let ext=file.name.split(".").pop().toLowerCase();
+
+    if(ext==="pdf") icon="📕";
+
+    else if(["doc","docx"].includes(ext)) icon="📘";
+
+    else if(["ppt","pptx"].includes(ext)) icon="📙";
+
+    else if(ext==="zip") icon="🗜️";
+
+    else if(["jpg","jpeg","png"].includes(ext)) icon="🖼️";
+
+    else if(ext==="mp4") icon="🎥";
+
+    preview.innerHTML=`
+
+    <div class="preview-card">
+
+        <div class="preview-left">
+
+            <div class="preview-icon">
+
+                ${icon}
+
+            </div>
+
+            <div>
+
+                <div class="preview-name">
+
+                    ${file.name}
+
+                </div>
+
+                <div class="preview-size">
+
+                    ${size} MB
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+
+            type="button"
+
+            class="remove-file"
+
+            onclick="removeFile()"
+
+        >
+
+            Remove
+
+        </button>
+
+    </div>
+
+    `;
+
+    preview.style.display="block";
+
+}
+
+function removeFile(){
+
+    fileInput.value="";
+
+    preview.style.display="none";
+
+}
+
+</script>
+<div id="materialModal" class="modal">
+
+    <div class="modal-content">
+
+        <span
+            class="close"
+            onclick="closeMaterialModal()"
+        >
+
+            &times;
+
+        </span>
+
+        <h2 class="modal-title">
+
+            Material Details
+
+        </h2>
+
+        <div class="info-row">
+
+            <span class="info-label">
+
+                Title
+
+            </span>
+
+            <span id="mTitle" class="info-value"></span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+
+                Subject
+
+            </span>
+
+            <span id="mSubject"></span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+
+                Grade
+
+            </span>
+
+            <span id="mGrade"></span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+
+                File
+
+            </span>
+
+            <span id="mFile"></span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+
+                Uploaded
+
+            </span>
+
+            <span id="mDate"></span>
+
+        </div>
+
+        <div
+            style="
+                margin-top:20px;
+            "
+        >
+
+            <strong>
+
+                Description
+
+            </strong>
+
+            <br><br>
+
+            <div id="mDescription">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div
+    id="schoolsModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <span
+            class="close"
+            onclick="closeSchoolsModal()"
+        >
+
+            &times;
+
+        </span>
+
+        <h2>
+
+            Assigned Schools
+
+        </h2>
+
+        <br>
+
+        <input
+
+            type="text"
+
+            id="schoolModalSearch"
+
+            placeholder="Search school..."
+
+            style="
+                width:100%;
+                padding:12px;
+                margin-bottom:20px;
+                border:1px solid #ccc;
+                border-radius:8px;
+            "
+
+        >
+
+        <div id="schoolContainer">
+
+            Loading...
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function viewMaterial(
+
+title,
+
+subject,
+
+grade,
+
+file,
+
+date,
+
+description
+
+){
+
+document.getElementById("mTitle").innerHTML=title;
+
+document.getElementById("mSubject").innerHTML=subject;
+
+document.getElementById("mGrade").innerHTML=grade;
+
+document.getElementById("mFile").innerHTML=file;
+
+document.getElementById("mDate").innerHTML=date;
+
+document.getElementById("mDescription").innerHTML=description;
+
+document.getElementById("materialModal").style.display="flex";
+
+}
+
+function closeMaterialModal(){
+
+document.getElementById("materialModal").style.display="none";
+
+}
+
+function closeSchoolsModal(){
+
+document.getElementById("schoolsModal").style.display="none";
+
+}
+
+window.onclick=function(e){
+
+if(e.target.classList.contains("modal")){
+
+e.target.style.display="none";
+
+}
+
+};
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Escape"){
+
+document.querySelectorAll(".modal").forEach(function(m){
+
+m.style.display="none";
+
+});
+
+}
+
+});
+
+</script>
+<script>
+async function openSchoolsModal(materialId){
+
+    const modal = document.getElementById("schoolsModal");
+    const container = document.getElementById("schoolContainer");
+
+    modal.style.display = "flex";
+    container.innerHTML = "Loading...";
+
+    const response = await fetch(`/material_schools/${materialId}`);
+    const schools = await response.json();
+
+    if (schools.length === 0){
+        container.innerHTML = "<p>No schools assigned.</p>";
+        return;
+    }
+
+    container.innerHTML = schools.map(
+        school => `<span class="school-pill">${school.name}</span>`
+    ).join("");
+
+    document.getElementById("schoolModalSearch").onkeyup = function(){
+        const value = this.value.toLowerCase();
+        document.querySelectorAll("#schoolContainer .school-pill").forEach(pill=>{
+            pill.style.display = pill.textContent.toLowerCase().includes(value)
+                ? "inline-block"
+                : "none";
+        });
+    };
+}
+
+
+
+
+
+//============================================
+// OPEN EDIT MODAL
+//============================================
+
+function openEditMaterialModal(id){
+
+    fetch("/get_material/" + id)
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        // form action
+        document.getElementById("editMaterialForm").action =
+            "/edit_material/" + id;
+
+        // basic fields
+        document.getElementById("edit_title").value =
+            data.title;
+
+        document.getElementById("edit_subject").value =
+            data.subject;
+
+        document.getElementById("edit_grade").value =
+            data.grade;
+
+        document.getElementById("edit_description").value =
+            data.description;
+
+        // active checkbox
+        document.getElementById("edit_active").checked =
+            data.active;
+
+        // clear all school checkboxes
+        document
+            .querySelectorAll(".edit-school-checkbox")
+            .forEach(cb => cb.checked = false);
+
+        // tick assigned schools
+        data.schools.forEach(function(id){
+
+            let checkbox =
+                document.getElementById(
+                    "edit_school_" + id
+                );
+
+            if(checkbox){
+
+                checkbox.checked = true;
+
+            }
+
+        });
+
+        // show modal
+        document.getElementById(
+            "editMaterialModal"
+        ).style.display = "flex";
+
+    });
+
+}
+
+
+
+//============================================
+// CLOSE MODAL
+//============================================
+
+function closeEditMaterialModal(){
+
+    document.getElementById(
+        "editMaterialModal"
+    ).style.display = "none";
+
+}
+
+
+
+//============================================
+// SEARCH SCHOOLS
+//============================================
+
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    function(){
+
+        const input =
+            document.getElementById(
+                "editSchoolSearch"
+            );
+
+        input.addEventListener(
+
+            "keyup",
+
+            function(){
+
+                let value =
+                    this.value.toLowerCase();
+
+                document
+                .querySelectorAll(".edit-school-item")
+
+                .forEach(function(item){
+
+                    item.style.display =
+                        item.innerText
+                        .toLowerCase()
+                        .includes(value)
+
+                        ?
+
+                        "block"
+
+                        :
+
+                        "none";
+
+                });
+
+            }
+
+        );
+
+    }
+
+);
+
+
+
+
+
+</script>
+<!-- ========================================= -->
+<!-- EDIT MATERIAL MODAL -->
+<!-- ========================================= -->
+
+<div
+    id="editMaterialModal"
+    style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.6);
+        justify-content:center;
+        align-items:center;
+        z-index:9999;
+    "
+>
+
+<div
+    style="
+        width:900px;
+        max-width:95%;
+        background:#fff;
+        border-radius:12px;
+        padding:25px;
+        max-height:90vh;
+        overflow-y:auto;
+    "
+>
+
+<h2 style="margin-top:0;">
+
+✏ Edit Material
+
+</h2>
+
+<form
+
+    id="editMaterialForm"
+
+    method="POST"
+
+    enctype="multipart/form-data"
+
+>
+
+<input
+
+    type="hidden"
+
+    id="edit_id"
+
+    name="id"
+
+>
+
+<div
+    style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:20px;
+    "
+>
+
+<!-- TITLE -->
+
+<div>
+
+<label>
+
+Title
+
+</label>
+
+<input
+
+    type="text"
+
+    id="edit_title"
+
+    name="title"
+
+    required
+
+    style="
+        width:100%;
+        padding:10px;
+    "
+
+>
+
+</div>
+
+<!-- SUBJECT -->
+
+<div>
+
+<label>
+
+Subject
+
+</label>
+
+<select
+
+    id="edit_subject"
+
+    name="subject"
+
+    style="
+        width:100%;
+        padding:10px;
+    "
+
+>
+
+<option>Mathematics</option>
+
+<option>English</option>
+
+<option>Kiswahili</option>
+
+<option>Biology</option>
+
+<option>Chemistry</option>
+
+<option>Physics</option>
+
+<option>History</option>
+
+<option>Geography</option>
+
+<option>CRE</option>
+
+<option>Business Studies</option>
+
+<option>Computer Studies</option>
+
+<option>Agriculture</option>
+
+</select>
+
+</div>
+
+<!-- GRADE -->
+
+<div>
+
+<label>
+
+Grade
+
+</label>
+
+<select
+
+    id="edit_grade"
+
+    name="grade"
+
+    style="
+        width:100%;
+        padding:10px;
+    "
+
+>
+
+<option>PRIMARY</option>
+
+<option>SECONDARY</option>
+
+<option>TERTIARY</option>
+
+</select>
+
+</div>
+
+<!-- ACTIVE -->
+
+<div
+style="
+display:flex;
+align-items:center;
+margin-top:28px;
+"
+>
+
+<label>
+
+<input
+
+type="checkbox"
+
+id="edit_active"
+
+name="active"
+
+>
+
+ Active Material
+
+</label>
+
+</div>
+
+</div>
+
+<!-- DESCRIPTION -->
+
+<div style="margin-top:20px;">
+
+<label>
+
+Description
+
+</label>
+
+<textarea
+
+id="edit_description"
+
+name="description"
+
+rows="5"
+
+style="
+width:100%;
+padding:10px;
+"
+
+></textarea>
+
+</div>
+
+<!-- FILE -->
+
+<div style="margin-top:20px;">
+
+<label>
+
+Replace File (optional)
+
+</label>
+
+<input
+
+type="file"
+
+id="edit_file"
+
+name="file"
+
+style="
+width:100%;
+padding:10px;
+"
+
+>
+
+</div>
+
+<!-- ======================= -->
+<!-- SCHOOL ASSIGNMENTS -->
+<!-- ======================= -->
+
+<div style="margin-top:25px;">
+
+<h3>
+
+Assigned Schools
+
+</h3>
+
+<input
+
+type="text"
+
+id="editSchoolSearch"
+
+placeholder="Search school..."
+
+style="
+width:100%;
+padding:10px;
+margin-bottom:15px;
+"
+
+>
+
+<div
+
+id="editSchoolList"
+
+style="
+max-height:250px;
+overflow-y:auto;
+border:1px solid #ddd;
+padding:15px;
+border-radius:8px;
+"
+
+>
+
+{% for school in schools %}
+
+<div
+
+class="edit-school-item"
+
+style="
+margin-bottom:8px;
+"
+
+>
+
+<label>
+
+<input
+
+type="checkbox"
+
+class="edit-school-checkbox"
+
+id="edit_school_{{ school.id }}"
+
+name="schools"
+
+value="{{ school.id }}"
+
+>
+
+{{ school.name }}
+
+</label>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+<!-- BUTTONS -->
+
+<div
+
+style="
+margin-top:30px;
+display:flex;
+justify-content:flex-end;
+gap:15px;
+"
+
+>
+
+<button
+
+type="button"
+
+onclick="closeEditMaterialModal()"
+
+style="
+background:#6b7280;
+color:white;
+padding:10px 20px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+"
+
+>
+
+Cancel
+
+</button>
+
+<button
+
+type="submit"
+
+style="
+background:#2563eb;
+color:white;
+padding:10px 20px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+"
+
+>
+
+💾 Save Changes
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+</body>
+

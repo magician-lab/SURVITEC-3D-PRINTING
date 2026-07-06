@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+
+        {{ material.title }}
+
+    </title>
+
+    <!-- Font Awesome -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+    >
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
+
+    <!-- CSS (Part B will replace this with full styling) -->
+
+<style>
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+    font-family:"Segoe UI",Tahoma,sans-serif;
+
+}
+
+body{
+
+    background:#eef3f9;
+
+    color:#1e293b;
+
+    overflow:hidden;
+
+    transition:.3s;
+
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.viewer-header{
+
+    height:72px;
+
+    background:#ffffff;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 35px;
+
+    box-shadow:0 2px 18px rgba(0,0,0,.08);
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+}
+
+.header-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+.header-left h2{
+
+    font-size:22px;
+
+    color:#1e3a8a;
+
+}
+
+.header-left p{
+
+    color:#64748b;
+
+    margin-top:4px;
+
+    font-size:14px;
+
+}
+
+.back-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:8px;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.back-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+/* ===========================
+DOWNLOAD BUTTON
+=========================== */
+
+.download-btn{
+
+    background:#10b981;
+
+    color:white;
+
+    padding:12px 20px;
+
+    border-radius:8px;
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+    transition:.25s;
+
+}
+
+.download-btn:hover{
+
+    background:#059669;
+
+}
+
+/* ===========================
+INFO BAR
+=========================== */
+
+.material-info{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+    padding:22px 35px;
+
+    background:#ffffff;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+.material-info div{
+
+    background:#f8fafc;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+
+}
+
+.material-info strong{
+
+    color:#2563eb;
+
+}
+
+/* ===========================
+TOOLBAR
+=========================== */
+
+.toolbar{
+
+    height:65px;
+
+    background:white;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:0 25px;
+
+    border-bottom:1px solid #e2e8f0;
+
+}
+
+.toolbar button{
+
+    width:46px;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#f1f5f9;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    font-size:18px;
+
+}
+
+.toolbar button:hover{
+
+    background:#2563eb;
+
+    color:white;
+
+    transform:translateY(-2px);
+
+}
+
+.toolbar-spacer{
+
+    flex:1;
+
+}
+
+#pageIndicator{
+
+    font-weight:600;
+
+    color:#475569;
+
+}
+
+/* ===========================
+VIEWER
+=========================== */
+
+.viewer-wrapper{
+
+    height:calc(100vh - 250px);
+
+    overflow:auto;
+
+    background:#dfe7ef;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:flex-start;
+
+    padding:35px;
+
+}
+
+/* ===========================
+PDF
+=========================== */
+
+#pdfViewer{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 10px 40px rgba(0,0,0,.15);
+
+}
+
+#pdfCanvas{
+
+    display:block;
+
+    max-width:100%;
+
+}
+
+/* ===========================
+IMAGE
+=========================== */
+
+#imageViewer{
+
+    text-align:center;
+
+}
+
+#imagePreview{
+
+    max-width:100%;
+
+    max-height:75vh;
+
+    border-radius:12px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+}
+
+/* ===========================
+VIDEO
+=========================== */
+
+#videoViewer{
+
+    width:100%;
+
+    max-width:1000px;
+
+}
+
+#videoPlayer{
+
+    border-radius:12px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+
+}
+
+/* ===========================
+OFFICE
+=========================== */
+
+#officeViewer{
+
+    background:white;
+
+    width:700px;
+
+    max-width:95%;
+
+    padding:60px;
+
+    text-align:center;
+
+    border-radius:14px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+}
+
+#officeViewer h2{
+
+    margin:20px 0;
+
+}
+
+#officeViewer p{
+
+    color:#64748b;
+
+    line-height:1.8;
+
+}
+
+/* ===========================
+DESCRIPTION
+=========================== */
+
+.description{
+
+    background:white;
+
+    padding:30px 35px;
+
+    border-top:1px solid #e2e8f0;
+
+}
+
+.description h3{
+
+    color:#1e3a8a;
+
+    margin-bottom:12px;
+
+}
+
+.description p{
+
+    color:#475569;
+
+    line-height:1.8;
+
+}
+
+/* ===========================
+DARK MODE
+=========================== */
+
+body.dark{
+
+    background:#0f172a;
+
+    color:white;
+
+}
+
+body.dark .viewer-header{
+
+    background:#1e293b;
+
+}
+
+body.dark .toolbar{
+
+    background:#1e293b;
+
+}
+
+body.dark .material-info{
+
+    background:#1e293b;
+
+}
+
+body.dark .material-info div{
+
+    background:#334155;
+
+    color:white;
+
+}
+
+body.dark .description{
+
+    background:#1e293b;
+
+}
+
+body.dark .description p{
+
+    color:#d1d5db;
+
+}
+
+body.dark #officeViewer{
+
+    background:#334155;
+
+    color:white;
+
+}
+
+/* ===========================
+SCROLLBAR
+=========================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#94a3b8;
+
+    border-radius:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#e2e8f0;
+
+}
+
+/* ===========================
+RESPONSIVE
+=========================== */
+
+@media(max-width:900px){
+
+.material-info{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.viewer-header{
+
+flex-direction:column;
+
+height:auto;
+
+padding:20px;
+
+gap:20px;
+
+align-items:flex-start;
+
+}
+
+.toolbar{
+
+flex-wrap:wrap;
+
+height:auto;
+
+padding:15px;
+
+}
+
+.viewer-wrapper{
+
+height:auto;
+
+min-height:70vh;
+
+padding:20px;
+
+}
+
+}
+
+@media(max-width:650px){
+
+.material-info{
+
+grid-template-columns:1fr;
+
+}
+
+.header-left{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+.download-btn{
+
+width:100%;
+
+text-align:center;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ============================== -->
+<!-- HEADER -->
+<!-- ============================== -->
+
+<header class="viewer-header">
+
+    <div class="header-left">
+
+        <a
+
+            href="{{ url_for('student_materials') }}"
+
+            class="back-btn"
+
+        >
+
+            <i class="fas fa-arrow-left"></i>
+
+            Back
+
+        </a>
+
+        <div>
+
+            <h2>
+
+                {{ material.title }}
+
+            </h2>
+
+            <p>
+
+                {{ material.subject }}
+
+                •
+
+                {{ material.grade }}
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="header-right">
+
+        <a
+
+            href="{{ url_for('download_material', id=material.id) }}"
+
+            class="download-btn"
+
+        >
+
+            <i class="fas fa-download"></i>
+
+            Download
+
+        </a>
+
+    </div>
+
+</header>
+
+<!-- ============================== -->
+<!-- INFORMATION BAR -->
+<!-- ============================== -->
+
+<section class="material-info">
+
+    <div>
+
+        <strong>
+
+            Uploaded
+
+        </strong>
+
+        <br>
+
+        {{ material.uploaded_at.strftime("%d %b %Y") }}
+
+    </div>
+
+    <div>
+
+        <strong>
+
+            Subject
+
+        </strong>
+
+        <br>
+
+        {{ material.subject }}
+
+    </div>
+
+    <div>
+
+        <strong>
+
+            Level
+
+        </strong>
+
+        <br>
+
+        {{ material.grade }}
+
+    </div>
+
+    <div>
+
+        <strong>
+
+            File
+
+        </strong>
+
+        <br>
+
+        {{ material.file_name }}
+
+    </div>
+
+</section>
+
+<!-- ============================== -->
+<!-- TOOLBAR -->
+<!-- ============================== -->
+
+<section class="toolbar">
+
+    <button id="zoomOut">
+
+        <i class="fas fa-search-minus"></i>
+
+    </button>
+
+    <button id="zoomIn">
+
+        <i class="fas fa-search-plus"></i>
+
+    </button>
+
+    <button id="fullscreenBtn">
+
+        <i class="fas fa-expand"></i>
+
+    </button>
+    <button id="prevPage">
+
+        <i class="fas fa-chevron-left"></i>
+
+    </button>
+
+    <button id="nextPage">
+
+        <i class="fas fa-chevron-right"></i>
+
+    </button>
+    <button id="printBtn">
+
+        <i class="fas fa-print"></i>
+
+    </button>
+
+    <button id="darkModeBtn">
+
+        <i class="fas fa-moon"></i>
+
+    </button>
+
+    <div class="toolbar-spacer"></div>
+
+    <span id="pageIndicator">
+
+        Ready
+
+    </span>
+
+</section>
+
+<!-- ============================== -->
+<!-- VIEWER AREA -->
+<!-- ============================== -->
+
+<div
+    id="viewerWrapper"
+    class="viewer-wrapper"
+>
+
+    <!-- ======================= -->
+    <!-- PDF -->
+    <!-- ======================= -->
+
+    <div
+        id="pdfViewer"
+        style="display:none;"
+    >
+
+        <canvas id="pdfCanvas"></canvas>
+
+    </div>
+
+    <!-- ======================= -->
+    <!-- IMAGE -->
+    <!-- ======================= -->
+
+    <div
+        id="imageViewer"
+        style="display:none;"
+    >
+
+        <img
+
+            id="imagePreview"
+
+            src="{{ url_for('material_content', id=material.id) }}"
+
+        >
+
+    </div>
+
+    <!-- ======================= -->
+    <!-- VIDEO -->
+    <!-- ======================= -->
+
+    <div
+        id="videoViewer"
+        style="display:none;"
+    >
+
+        <video
+
+            controls
+
+            id="videoPlayer"
+
+            width="100%"
+
+        >
+
+            <source
+
+                src="{{ url_for('material_content', id=material.id) }}"
+
+            >
+
+        </video>
+
+    </div>
+
+    <!-- ======================= -->
+    <!-- OFFICE DOCUMENTS -->
+    <!-- ======================= -->
+
+    <div
+        id="officeViewer"
+        style="display:none;"
+    >
+
+        <i
+            class="fas fa-file-word"
+            style="font-size:90px;color:#2563eb;"
+        ></i>
+
+        <h2>
+
+            Preview not available
+
+        </h2>
+
+        <p>
+
+            This file type cannot be previewed inside your browser.
+
+            Click Download to open it using Microsoft Office or another compatible application.
+
+        </p>
+
+    </div>
+
+</div>
+
+<!-- ============================== -->
+<!-- DESCRIPTION -->
+<!-- ============================== -->
+
+<section class="description">
+
+    <h3>
+
+        Description
+
+    </h3>
+
+    <p>
+
+        {{ material.description or "No description provided." }}
+
+    </p>
+
+</section>
+
+<!-- ============================== -->
+<!-- HIDDEN VALUES -->
+<!-- ============================== -->
+
+<input
+
+    type="hidden"
+
+    id="fileExtension"
+
+    value="{{ extension }}"
+
+>
+
+<input
+
+    type="hidden"
+
+    id="contentUrl"
+
+    value="{{ url_for('material_content', id=material.id) }}"
+
+>
+
+<!-- ============================== -->
+<!-- PART C -->
+<!-- ============================== -->
+
+<script>
+/********************************************************************
+ *
+ * SURVITEC LMS MATERIAL VIEWER
+ *
+ ********************************************************************/
+
+const extension = document
+.getElementById("fileExtension")
+.value
+.toLowerCase();
+
+const contentUrl = document
+.getElementById("contentUrl")
+.value;
+
+const pdfViewer =
+document.getElementById("pdfViewer");
+
+const imageViewer =
+document.getElementById("imageViewer");
+
+const videoViewer =
+document.getElementById("videoViewer");
+
+const officeViewer =
+document.getElementById("officeViewer");
+
+const pageIndicator =
+document.getElementById("pageIndicator");
+document
+
+.getElementById("prevPage")
+
+.addEventListener(
+
+"click",
+
+previousPage
+
+);
+
+document
+
+.getElementById("nextPage")
+
+.addEventListener(
+
+"click",
+
+nextPage
+
+);
+/************************************************************
+*
+* Hide all viewers
+*
+************************************************************/
+
+function hideAllViewers(){
+
+    pdfViewer.style.display="none";
+
+    imageViewer.style.display="none";
+
+    videoViewer.style.display="none";
+
+    officeViewer.style.display="none";
+
+}
+
+/************************************************************
+*
+* Detect file type
+*
+************************************************************/
+
+hideAllViewers();
+
+if(extension==="pdf"){
+
+    pdfViewer.style.display="block";
+
+    pageIndicator.innerHTML="Loading PDF...";
+
+}
+
+else if(
+
+    [
+
+        "png",
+
+        "jpg",
+
+        "jpeg",
+
+        "gif",
+
+        "webp"
+
+    ].includes(extension)
+
+){
+
+    imageViewer.style.display="block";
+
+    pageIndicator.innerHTML="Image Preview";
+
+}
+
+else if(
+
+    [
+
+        "mp4",
+
+        "webm",
+
+        "ogg"
+
+    ].includes(extension)
+
+){
+
+    videoViewer.style.display="block";
+
+    pageIndicator.innerHTML="Video";
+
+}
+
+else{
+
+    officeViewer.style.display="block";
+
+    pageIndicator.innerHTML="Preview unavailable";
+
+}
+
+/********************************************************************
+*
+* DARK MODE
+*
+********************************************************************/
+
+const darkBtn =
+document.getElementById("darkModeBtn");
+
+darkBtn.addEventListener(
+
+    "click",
+
+    ()=>{
+
+        document.body.classList.toggle("dark");
+
+    }
+
+);
+
+/********************************************************************
+*
+* FULLSCREEN
+*
+********************************************************************/
+
+document
+.getElementById("fullscreenBtn")
+.addEventListener(
+
+    "click",
+
+    ()=>{
+
+        if(!document.fullscreenElement){
+
+            document.documentElement.requestFullscreen();
+
+        }
+
+        else{
+
+            document.exitFullscreen();
+
+        }
+
+    }
+
+);
+
+/********************************************************************
+*
+* PRINT
+*
+********************************************************************/
+
+document
+.getElementById("printBtn")
+.addEventListener(
+
+    "click",
+
+    ()=>{
+
+        window.print();
+
+    }
+
+);
+
+/********************************************************************
+*
+* ZOOM
+*
+********************************************************************/
+
+let zoom=1;
+
+const image =
+document.getElementById("imagePreview");
+
+const pdfCanvas =
+document.getElementById("pdfCanvas");
+
+function applyZoom(){
+
+    image.style.transform=
+    `scale(${zoom})`;
+
+    pdfCanvas.style.transform=
+    `scale(${zoom})`;
+
+}
+
+document
+.getElementById("zoomIn")
+.addEventListener(
+
+    "click",
+
+    ()=>{
+
+        zoom+=0.1;
+
+        applyZoom();
+
+    }
+
+);
+
+document
+.getElementById("zoomOut")
+.addEventListener(
+
+    "click",
+
+    ()=>{
+
+        zoom=Math.max(
+
+            0.5,
+
+            zoom-0.1
+
+        );
+
+        applyZoom();
+
+    }
+
+);
+
+/********************************************************************
+*
+* CTRL + Mouse Wheel
+*
+********************************************************************/
+
+document.addEventListener(
+
+    "wheel",
+
+    function(e){
+
+        if(!e.ctrlKey)
+
+            return;
+
+        e.preventDefault();
+
+        if(e.deltaY<0){
+
+            zoom+=0.1;
+
+        }
+
+        else{
+
+            zoom=Math.max(
+
+                0.5,
+
+                zoom-0.1
+
+            );
+
+        }
+
+        applyZoom();
+
+    },
+
+    {
+
+        passive:false
+
+    }
+
+);
+
+/********************************************************************
+*
+* Keyboard Shortcuts
+*
+********************************************************************/
+
+document.addEventListener(
+
+    "keydown",
+
+    function(e){
+
+        if(e.key==="+" ){
+
+            zoom+=0.1;
+
+            applyZoom();
+
+        }
+
+        if(e.key==="-" ){
+
+            zoom=Math.max(
+
+                .5,
+
+                zoom-.1
+
+            );
+
+            applyZoom();
+
+        }
+
+    }
+
+);
+
+/********************************************************************
+ *
+ * PDF.js VIEWER
+ *
+ ********************************************************************/
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
+
+let pdfDoc = null;
+
+let pageNum = 1;
+
+let pageRendering = false;
+
+let pageNumPending = null;
+
+let scale = 1.25;
+
+const canvas = document.getElementById("pdfCanvas");
+
+const ctx = canvas.getContext("2d");
+
+/*************************************************************
+Render Page
+*************************************************************/
+
+function renderPage(num){
+
+    pageRendering = true;
+
+    pdfDoc.getPage(num).then(function(page){
+
+        const viewport = page.getViewport({
+
+            scale:scale
+
+        });
+
+        canvas.height = viewport.height;
+
+        canvas.width = viewport.width;
+
+        const renderContext = {
+
+            canvasContext:ctx,
+
+            viewport:viewport
+
+        };
+
+        const renderTask =
+
+        page.render(renderContext);
+
+        renderTask.promise.then(function(){
+
+            pageRendering = false;
+
+            if(pageNumPending !== null){
+
+                renderPage(pageNumPending);
+
+                pageNumPending = null;
+
+            }
+
+            pageIndicator.innerHTML =
+
+            "Page "
+
+            + pageNum
+
+            + " of "
+
+            + pdfDoc.numPages;
+
+        });
+
+    });
+
+}
+
+/*************************************************************
+Queue Rendering
+*************************************************************/
+
+function queueRenderPage(num){
+
+    if(pageRendering){
+
+        pageNumPending = num;
+
+    }
+
+    else{
+
+        renderPage(num);
+
+    }
+
+}
+
+/*************************************************************
+Previous Page
+*************************************************************/
+
+function previousPage(){
+
+    if(pageNum<=1)
+
+        return;
+
+    pageNum--;
+
+    queueRenderPage(pageNum);
+
+}
+
+/*************************************************************
+Next Page
+*************************************************************/
+
+function nextPage(){
+
+    if(pageNum>=pdfDoc.numPages)
+
+        return;
+
+    pageNum++;
+
+    queueRenderPage(pageNum);
+
+}
+
+/*************************************************************
+Load PDF
+*************************************************************/
+
+function loadPDF(){
+
+    pdfjsLib
+
+    .getDocument(contentUrl)
+
+    .promise
+
+    .then(function(pdf){
+
+        pdfDoc = pdf;
+
+        renderPage(pageNum);
+
+    });
+
+}
+
+/********************************************************************
+ *
+ * PDF Controls
+ *
+ ********************************************************************/
+
+if(extension==="pdf"){
+
+    loadPDF();
+
+}
+
+/**********************
+Zoom In
+**********************/
+
+document
+
+.getElementById("zoomIn")
+
+.addEventListener(
+
+"click",
+
+function(){
+
+    if(extension!=="pdf")
+
+        return;
+
+    scale += 0.15;
+
+    queueRenderPage(pageNum);
+
+});
+
+/**********************
+Zoom Out
+**********************/
+
+document
+
+.getElementById("zoomOut")
+
+.addEventListener(
+
+"click",
+
+function(){
+
+    if(extension!=="pdf")
+
+        return;
+
+    scale = Math.max(
+
+        0.5,
+
+        scale-0.15
+
+    );
+
+    queueRenderPage(pageNum);
+
+});
+
+/**********************
+Keyboard Navigation
+**********************/
+
+document.addEventListener(
+
+"keydown",
+
+function(e){
+
+    if(extension!=="pdf")
+
+        return;
+
+    if(e.key==="ArrowRight"){
+
+        nextPage();
+
+    }
+
+    if(e.key==="ArrowLeft"){
+
+        previousPage();
+
+    }
+
+});
+
+/**********************
+Mouse Wheel Pages
+**********************/
+
+canvas.addEventListener(
+
+"wheel",
+
+function(e){
+
+    if(extension!=="pdf")
+
+        return;
+
+    if(e.deltaY>0){
+
+        nextPage();
+
+    }
+
+    else{
+
+        previousPage();
+
+    }
+
+});
+
+
+</script>
+
+</body>
+
+</html>

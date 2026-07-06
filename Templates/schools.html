@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
+>
+
+<title>School Management</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Segoe UI',sans-serif;
+
+    background:#f4f6f9;
+
+    padding:20px;
+
+    color:#333;
+}
+
+.container{
+
+    max-width:1400px;
+
+    margin:auto;
+}
+
+h1{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+    color:#1f2937;
+}
+
+/* ==========================================
+TOP BAR
+========================================== */
+
+.top-bar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-bottom:20px;
+}
+
+.back-btn{
+
+    background:#200ccf;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:10px 15px;
+
+    border-radius:8px;
+}
+
+.back-btn:hover{
+
+    opacity:.9;
+}
+
+.count{
+
+    font-weight:bold;
+
+    color:#2563eb;
+}
+
+/* ==========================================
+FLASH
+========================================== */
+
+.flash{
+
+    margin-bottom:15px;
+}
+
+.flash-message{
+
+    padding:12px;
+
+    border-radius:8px;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+}
+
+.success{
+
+    background:#d1fae5;
+
+    color:#065f46;
+}
+
+.error{
+
+    background:#fee2e2;
+
+    color:#991b1b;
+}
+
+/* ==========================================
+CARD
+========================================== */
+
+.card{
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+
+    margin-bottom:20px;
+}
+
+.card h2{
+
+    margin-bottom:15px;
+
+    color:#111827;
+}
+
+/* ==========================================
+FORM
+========================================== */
+
+.add-form{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:15px;
+}
+
+input{
+
+    padding:12px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    width:100%;
+}
+
+input:focus{
+
+    outline:none;
+
+    border-color:#2563eb;
+}
+
+.submit-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+}
+
+.submit-btn:hover{
+
+    background:#1d4ed8;
+}
+
+/* ==========================================
+TABLE
+========================================== */
+
+.table-wrapper{
+
+    overflow-x:auto;
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    min-width:1200px;
+}
+
+th{
+
+    background:#111827;
+
+    color:white;
+
+    padding:12px;
+
+    text-align:center;
+}
+
+td{
+
+    padding:10px;
+
+    border:1px solid #e5e7eb;
+
+    text-align:center;
+}
+
+tr:nth-child(even){
+
+    background:#f9fafb;
+}
+
+.table-input{
+
+    width:100%;
+
+    min-width:140px;
+}
+
+/* ==========================================
+BUTTONS
+========================================== */
+
+.btn{
+
+    border:none;
+
+    cursor:pointer;
+
+    padding:8px 12px;
+
+    border-radius:6px;
+
+    color:white;
+
+    font-weight:600;
+}
+
+.edit{
+
+    background:#f59e0b;
+}
+
+.edit:hover{
+
+    background:#d97706;
+}
+
+.delete{
+
+    background:#dc2626;
+}
+
+.delete:hover{
+
+    background:#b91c1c;
+}
+
+/* ==========================================
+STATUS BADGE
+========================================== */
+
+.badge{
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    color:white;
+
+    font-size:12px;
+
+    font-weight:bold;
+}
+
+.active{
+
+    background:#10b981;
+}
+
+.inactive{
+
+    background:#ef4444;
+}
+
+/* ==========================================
+TOGGLE
+========================================== */
+
+.toggle-btn{
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:20px;
+
+    cursor:pointer;
+
+    color:white;
+
+    font-weight:bold;
+}
+
+.toggle-on{
+
+    background:#10b981;
+}
+
+.toggle-off{
+
+    background:#ef4444;
+}
+
+/* ==========================================
+ACTIONS
+========================================== */
+
+.actions{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:6px;
+
+    flex-wrap:wrap;
+}
+
+/* ==========================================
+RESPONSIVE
+========================================== */
+
+@media(max-width:768px){
+
+    body{
+
+        padding:10px;
+    }
+
+    .top-bar{
+
+        flex-direction:column;
+    }
+
+    .card{
+
+        padding:15px;
+    }
+}
+.students{
+
+    background:#0ea5e9;
+
+    color:white;
+}
+
+.students:hover{
+
+    background:#0284c7;
+}
+
+.enable{
+
+    background:#16a34a;
+
+    color:white;
+}
+
+.enable:hover{
+
+    background:#15803d;
+}
+
+.disable{
+
+    background:#f59e0b;
+
+    color:white;
+}
+
+.disable:hover{
+
+    background:#d97706;
+}
+
+.actions{
+
+    display:flex;
+
+    gap:6px;
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+
+<h1>School Management</h1>
+
+<div class="top-bar">
+
+    <a
+        href="/school_admins"
+        class="back-btn"
+    >
+        School Admins
+    </a>
+
+    <a
+        href="/materials"
+        class="back-btn"
+    >
+        material management
+    </a>
+    <a
+        href="/users"
+        class="back-btn"
+    >
+      User management
+    </a>
+    <a
+        href="/surveys"
+        class="back-btn"
+    >
+        Survey management
+    </a>
+
+<div class="count">
+
+    <div>
+        Total Schools:
+        {{ schools|length }}
+    </div>
+
+    <div>
+        Active:
+        {{ active_schools }}
+    </div>
+
+    <div>
+        Inactive:
+        {{ inactive_schools }}
+    </div>
+
+</div>
+
+</div>
+
+<!-- ======================================
+FLASH MESSAGES
+======================================= -->
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        <div class="flash">
+
+            {% for category,message in messages %}
+
+                <div
+                    class="flash-message {{ category }}"
+                >
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+<!-- ======================================
+ADD SCHOOL
+======================================= -->
+
+<div class="card">
+
+    <h2>Add New School</h2>
+
+    <form
+        method="POST"
+        action="/schools"
+        class="add-form"
+    >
+
+        <input
+            type="text"
+            name="school_code"
+            placeholder="School Code"
+            required
+        >
+
+        <input
+            type="text"
+            name="name"
+            placeholder="School Name"
+            required
+        >
+
+        <input
+            type="email"
+            name="email"
+            placeholder="Email"
+        >
+
+        <input
+            type="text"
+            name="phone"
+            placeholder="Phone"
+        >
+
+        <button
+            type="submit"
+            class="submit-btn"
+        >
+            Add School
+        </button>
+
+    </form>
+
+</div>
+
+<!-- ======================================
+SCHOOLS TABLE
+======================================= -->
+
+<div class="card">
+
+    <h2>Registered Schools</h2>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>NO</th>
+
+                    <th>Code</th>
+
+                    <th>Name</th>
+
+                    <th>Email</th>
+
+                    <th>Phone</th>
+
+                    <th>Status</th>
+
+                    <th>Created</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for school in schools %}
+
+                <tr>
+
+                    <!-- ===========================
+                        UPDATE FORM
+                    ============================ -->
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('edit_school', id=school.id) }}"
+                    >
+
+                        <td>
+
+                            {{ loop.index }}
+
+                        </td>
+
+                        <td>
+
+                            <input
+                                type="text"
+                                name="school_code"
+                                value="{{ school.school_code }}"
+                                class="table-input"
+                                required
+                            >
+
+                        </td>
+
+                        <td>
+
+                            <input
+                                type="text"
+                                name="name"
+                                value="{{ school.name }}"
+                                class="table-input"
+                                required
+                            >
+
+                        </td>
+
+                        <td>
+
+                            <input
+                                type="email"
+                                name="email"
+                                value="{{ school.email or '' }}"
+                                class="table-input"
+                            >
+
+                        </td>
+
+                        <td>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                value="{{ school.phone or '' }}"
+                                class="table-input"
+                            >
+
+                        </td>
+
+                        <td>
+
+                            {% if school.active %}
+
+                                <span class="badge active">
+
+                                    Active
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge inactive">
+
+                                    Inactive
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if school.created_at %}
+
+                                {{ school.created_at.strftime('%Y-%m-%d') }}
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <div class="actions">
+
+                                <!-- UPDATE -->
+
+                                <button
+                                    type="submit"
+                                    class="btn edit"
+                                >
+                                    Update
+                                </button>
+
+                    </form>
+
+                                <!-- STUDENTS -->
+
+                                <form
+                                    method="GET"
+                                    action="{{ url_for('school_students', school_id=school.id) }}"
+                                    style="display:inline;"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn students"
+                                    >
+
+                                        Students
+
+                                    </button>
+
+                                </form>
+
+                                <!-- ACTIVATE / DEACTIVATE -->
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('toggle_school', id=school.id) }}"
+                                    style="display:inline;"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn {% if school.active %}disable{% else %}enable{% endif %}"
+                                    >
+
+                                        {% if school.active %}
+
+                                            Disable
+
+                                        {% else %}
+
+                                            Enable
+
+                                        {% endif %}
+
+                                    </button>
+
+                                </form>
+
+                                <!-- DELETE -->
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('delete_school', id=school.id) }}"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Delete this school permanently?');"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn delete"
+                                    >
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</div>
+
+</body>
+
+</html>
