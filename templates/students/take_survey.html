@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+
+{{ survey.title }}
+
+</title>
+
+<style>
+
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+
+}
+
+body{
+
+background:#f4f6fb;
+
+}
+
+.wrapper{
+
+width:95%;
+max-width:1400px;
+margin:25px auto;
+
+}
+
+.header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+margin-bottom:20px;
+
+}
+
+.left h2{
+
+color:#1d4ed8;
+
+margin-bottom:8px;
+
+}
+
+.left p{
+
+color:#666;
+
+margin:3px 0;
+
+}
+
+.timer{
+
+background:#dc2626;
+color:white;
+padding:14px 25px;
+font-size:22px;
+font-weight:bold;
+border-radius:10px;
+
+}
+
+.progress-card{
+
+background:white;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+
+}
+
+.progress-bar{
+
+height:12px;
+background:#e5e7eb;
+border-radius:20px;
+overflow:hidden;
+
+}
+
+.progress{
+
+height:100%;
+width:0%;
+background:#2563eb;
+
+}
+
+.main{
+
+display:grid;
+grid-template-columns:250px 1fr;
+gap:20px;
+
+}
+
+.navigator{
+
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+.navigator h3{
+
+margin-bottom:15px;
+
+}
+
+.question-grid{
+
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:10px;
+
+}
+
+.question-grid button{
+
+height:45px;
+border:none;
+border-radius:8px;
+background:#dbeafe;
+cursor:pointer;
+font-weight:bold;
+
+}
+
+.question-grid button.active{
+
+background:#2563eb;
+color:white;
+
+}
+
+.question-card{
+
+background:white;
+padding:30px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+.question-card h3{
+
+margin-bottom:20px;
+
+}
+
+.option{
+
+padding:15px;
+border:1px solid #ddd;
+border-radius:8px;
+margin-bottom:12px;
+cursor:pointer;
+
+}
+
+.option:hover{
+
+background:#eff6ff;
+
+}
+
+.footer{
+
+display:flex;
+justify-content:space-between;
+margin-top:30px;
+
+}
+
+.btn{
+
+padding:12px 25px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:15px;
+color:white;
+
+}
+
+.prev{
+
+background:#6b7280;
+
+}
+
+.next{
+
+background:#2563eb;
+
+}
+
+.submit{
+
+background:#16a34a;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="header">
+
+<div class="left">
+
+<h2>
+
+{{ survey.title }}
+
+</h2>
+
+<p>
+
+Student:
+
+<strong>
+
+{{ session.student_name }}
+
+</strong>
+
+</p>
+
+<p>
+
+Subject:
+
+{{ survey.subject }}
+
+</p>
+
+<p>
+
+Duration:
+
+{{ survey.duration_minutes }} Minutes
+
+</p>
+
+</div>
+
+<div
+class="timer"
+id="timer">
+
+--:--
+
+</div>
+
+</div>
+
+<div class="progress-card">
+
+<div
+class="progress-bar">
+
+<div
+class="progress"
+id="progressBar">
+
+</div>
+
+</div>
+
+</div>
+
+<div class="main">
+
+<div class="navigator">
+
+<h3>
+
+Questions
+
+</h3>
+
+<div
+class="question-grid">
+
+{% for question in questions %}
+
+<button
+
+class="nav-question"
+
+data-question="{{ loop.index0 }}"
+
+>
+
+{{ loop.index }}
+
+</button>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+<div class="question-card">
+
+<form
+
+    id="examForm"
+
+    method="POST"
+
+    action="{{ url_for('submit_survey', attempt_id=attempt.id) }}"
+
+>
+
+{% for question in questions %}
+
+<div
+
+class="question-page"
+
+{% if not loop.first %}
+
+style="display:none"
+
+{% endif %}
+
+>
+
+<h3>
+
+Question {{ question.question_no }}
+
+</h3>
+
+<p
+style="margin-bottom:25px;">
+
+{{ question.question }}
+
+</p>
+
+<label class="option">
+
+<input
+
+type="radio"
+
+name="q{{ question.id }}"
+
+value="A"
+
+>
+
+{{ question.option_a }}
+
+</label>
+
+<label class="option">
+
+<input
+
+type="radio"
+
+name="q{{ question.id }}"
+
+value="B"
+
+>
+
+{{ question.option_b }}
+
+</label>
+
+<label class="option">
+
+<input
+
+type="radio"
+
+name="q{{ question.id }}"
+
+value="C"
+
+>
+
+{{ question.option_c }}
+
+</label>
+
+<label class="option">
+
+<input
+
+type="radio"
+
+name="q{{ question.id }}"
+
+value="D"
+
+>
+
+{{ question.option_d }}
+
+</label>
+
+</div>
+
+{% endfor %}
+
+<div class="footer">
+
+<button
+
+type="button"
+
+class="btn prev"
+
+id="prevBtn"
+
+>
+
+Previous
+
+</button>
+
+<button
+
+type="button"
+
+class="btn next"
+
+id="nextBtn"
+
+>
+
+Next
+
+</button>
+
+<button
+
+type="button"
+
+class="btn submit"
+
+id="submitBtn"
+
+style="display:none"
+
+>
+
+Submit Exam
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+<script>
+
+let currentQuestion = 0;
+
+const questionPages = document.querySelectorAll(".question-page");
+
+const navigatorButtons = document.querySelectorAll(".nav-question");
+
+const totalQuestions = questionPages.length;
+
+const progressBar = document.getElementById("progressBar");
+
+const prevBtn = document.getElementById("prevBtn");
+
+const nextBtn = document.getElementById("nextBtn");
+
+const submitBtn = document.getElementById("submitBtn");
+
+//////////////////////////////////////////////////////////
+// DISPLAY QUESTION
+//////////////////////////////////////////////////////////
+
+function showQuestion(index){
+
+    questionPages.forEach(function(page){
+
+        page.style.display = "none";
+
+    });
+
+    navigatorButtons.forEach(function(btn){
+
+        btn.classList.remove("active");
+
+    });
+
+    questionPages[index].style.display = "block";
+
+    navigatorButtons[index].classList.add("active");
+
+    const progress = ((index + 1) / totalQuestions) * 100;
+
+    progressBar.style.width = progress + "%";
+
+    prevBtn.style.display = index === 0 ? "none" : "inline-block";
+
+    if(index === totalQuestions - 1){
+
+        nextBtn.style.display = "none";
+
+        submitBtn.style.display = "inline-block";
+
+    }
+
+    else{
+
+        nextBtn.style.display = "inline-block";
+
+        submitBtn.style.display = "none";
+
+    }
+
+}
+
+//////////////////////////////////////////////////////////
+// NEXT
+//////////////////////////////////////////////////////////
+
+nextBtn.addEventListener(
+
+    "click",
+
+    function(){
+
+        if(currentQuestion < totalQuestions - 1){
+
+            currentQuestion++;
+
+            showQuestion(currentQuestion);
+
+        }
+
+    }
+
+);
+
+//////////////////////////////////////////////////////////
+// PREVIOUS
+//////////////////////////////////////////////////////////
+
+prevBtn.addEventListener(
+
+    "click",
+
+    function(){
+
+        if(currentQuestion > 0){
+
+            currentQuestion--;
+
+            showQuestion(currentQuestion);
+
+        }
+
+    }
+
+);
+
+//////////////////////////////////////////////////////////
+// CLICK NAVIGATOR
+//////////////////////////////////////////////////////////
+
+navigatorButtons.forEach(function(button,index){
+
+    button.addEventListener(
+
+        "click",
+
+        function(){
+
+            currentQuestion = index;
+
+            showQuestion(index);
+
+        }
+
+    );
+
+});
+
+//////////////////////////////////////////////////////////
+// INITIALIZE
+//////////////////////////////////////////////////////////
+
+showQuestion(0);
+
+//////////////////////////////////////////////////////////
+// COUNTDOWN TIMER
+//////////////////////////////////////////////////////////
+
+let remainingSeconds = {{ survey.duration_minutes }} * 60;
+
+const timer = document.getElementById("timer");
+
+function updateTimer(){
+
+    const minutes = Math.floor(
+
+        remainingSeconds / 60
+
+    );
+
+    const seconds = remainingSeconds % 60;
+
+    timer.innerHTML =
+
+        String(minutes).padStart(2,"0")
+
+        +
+
+        ":"
+
+        +
+
+        String(seconds).padStart(2,"0");
+
+    if(remainingSeconds <= 0){
+
+        clearInterval(timerInterval);
+
+        alert(
+
+            "Time is up! Your exam will now be submitted."
+
+        );
+
+        submitExam();
+
+    }
+
+    remainingSeconds--;
+
+}
+
+updateTimer();
+
+const timerInterval = setInterval(
+
+    updateTimer,
+
+    1000
+
+);
+
+//////////////////////////////////////////////////////////
+// SUBMIT
+//////////////////////////////////////////////////////////
+
+submitBtn.addEventListener(
+
+    "click",
+
+    function(){
+
+        if(
+
+            confirm(
+
+                "Are you sure you want to submit?"
+
+            )
+
+        ){
+
+            submitExam();
+
+        }
+
+    }
+
+);
+
+//////////////////////////////////////////////////////////
+// PLACEHOLDER
+//////////////////////////////////////////////////////////
+
+function submitExam(){
+
+    document.getElementById(
+
+        "examForm"
+
+    ).submit();
+
+}
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+
+Survey Management
+
+</title>
+
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+>
+
+<style>
+
+/*****************************************
+GENERAL
+******************************************/
+
+*{
+
+margin:0;
+
+padding:0;
+
+box-sizing:border-box;
+
+font-family:Segoe UI,Tahoma,sans-serif;
+
+}
+
+body{
+
+background:#f5f7fb;
+
+}
+
+.container{
+
+width:95%;
+
+margin:35px auto;
+
+}
+
+/*****************************************
+HEADER
+******************************************/
+
+.page-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:25px;
+
+}
+
+.page-header h1{
+
+font-size:32px;
+
+color:#1e3a8a;
+
+}
+
+.create-btn{
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+padding:14px 22px;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:15px;
+
+font-weight:600;
+
+}
+
+.create-btn:hover{
+
+background:#1d4ed8;
+
+}
+
+/*****************************************
+STATS
+******************************************/
+
+.stats{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+margin-bottom:30px;
+
+}
+
+.stat-card{
+
+background:white;
+
+padding:25px;
+
+border-radius:12px;
+
+box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+}
+
+.stat-card h2{
+
+font-size:30px;
+
+color:#2563eb;
+
+margin-bottom:8px;
+
+}
+
+.stat-card p{
+
+color:#64748b;
+
+}
+
+/*****************************************
+SEARCH
+******************************************/
+
+.search-box{
+
+margin-bottom:25px;
+
+}
+
+.search-box input{
+
+width:100%;
+
+padding:14px;
+
+border:1px solid #dbe3ee;
+
+border-radius:8px;
+
+font-size:15px;
+
+}
+
+/*****************************************
+TABLE
+******************************************/
+
+.table-card{
+
+background:white;
+
+border-radius:12px;
+
+overflow:hidden;
+
+box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th{
+
+background:#2563eb;
+
+color:white;
+
+padding:16px;
+
+text-align:left;
+
+}
+
+td{
+
+padding:15px;
+
+border-bottom:1px solid #edf2f7;
+
+}
+
+tr:hover{
+
+background:#f8fbff;
+
+}
+
+.badge{
+
+padding:6px 12px;
+
+border-radius:20px;
+
+font-size:13px;
+
+font-weight:bold;
+
+}
+
+.active{
+
+background:#dcfce7;
+
+color:#15803d;
+
+}
+
+.inactive{
+
+background:#fee2e2;
+
+color:#dc2626;
+
+}
+
+.btn{
+
+padding:8px 12px;
+
+border:none;
+
+border-radius:6px;
+
+cursor:pointer;
+
+color:white;
+
+margin:2px;
+
+font-size:13px;
+
+text-decoration:none;
+
+display:inline-block;
+
+}
+
+.questions-btn{
+
+background:#0ea5e9;
+
+}
+
+.schools-btn{
+
+background:#7c3aed;
+
+}
+.back-btn{
+
+    background:#200ccf;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:10px 15px;
+
+    border-radius:8px;
+}
+
+.back-btn:hover{
+
+    opacity:.9;
+}
+.edit-btn{
+
+background:#2563eb;
+
+}
+
+.toggle-btn{
+
+background:#f59e0b;
+
+}
+
+.delete-btn{
+
+background:#dc2626;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="page-header">
+
+<h1>
+
+Survey Management
+
+</h1>
+    <a
+        href="/schools"
+        class="back-btn"
+    >
+        dashboard
+    </a>
+<button
+
+class="create-btn"
+
+onclick="openSurveyModal()"
+
+>
+
+<i class="fas fa-plus"></i>
+
+New Survey
+
+</button>
+
+</div>
+
+<div class="stats">
+
+<div class="stat-card">
+
+<h2>
+
+{{ surveys|length }}
+
+</h2>
+
+<p>
+
+Total Surveys
+
+</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2>
+
+{{ surveys|selectattr('active')|list|length }}
+
+</h2>
+
+<p>
+
+Active
+
+</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2>
+
+{{ surveys|rejectattr('active')|list|length }}
+
+</h2>
+
+<p>
+
+Inactive
+
+</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2>
+
+{{ schools|length }}
+
+</h2>
+
+<p>
+
+Schools
+
+</p>
+
+</div>
+
+</div>
+
+<div class="search-box">
+
+<input
+
+type="text"
+
+id="surveySearch"
+
+placeholder="Search survey..."
+
+>
+
+</div>
+
+<div class="table-card">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Title</th>
+
+<th>Subject</th>
+
+<th>Grade</th>
+
+<th>Duration</th>
+
+<th>Questions</th>
+
+<th>Status</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="surveyTable">
+    {% for survey in surveys %}
+
+<tr class="survey-row">
+
+    <td>
+
+        <strong>
+
+            {{ survey.title }}
+
+        </strong>
+
+        <br>
+
+        <small style="color:#64748b;">
+
+            {{ survey.description or "No description" }}
+
+        </small>
+
+    </td>
+
+    <td>
+
+        {{ survey.subject }}
+
+    </td>
+
+    <td>
+
+        {{ survey.grade }}
+
+    </td>
+
+    <td>
+
+        {{ survey.duration_minutes }} mins
+
+    </td>
+
+    <td>
+
+        {{ survey.questions|length }}
+
+    </td>
+
+    <td>
+
+        {% if survey.active %}
+
+            <span class="badge active">
+
+                Active
+
+            </span>
+
+        {% else %}
+
+            <span class="badge inactive">
+
+                Inactive
+
+            </span>
+
+        {% endif %}
+
+    </td>
+
+    <td>
+
+        <div
+            style="
+                display:flex;
+                flex-wrap:wrap;
+                gap:6px;
+            "
+        >
+
+            <!-- QUESTIONS -->
+
+            <a
+
+                href="{{ url_for('survey_questions', id=survey.id) }}"
+
+                class="btn questions-btn"
+
+            >
+
+                <i class="fas fa-list"></i>
+
+                Questions
+
+            </a>
+
+            <!-- SCHOOLS -->
+
+            <button
+
+                type="button"
+
+                class="btn schools-btn"
+
+                onclick="openSurveySchoolsModal({{ survey.id }})"
+
+            >
+
+                <i class="fas fa-school"></i>
+
+                Schools
+
+            </button>
+
+            <!-- EDIT -->
+
+            <button
+
+                type="button"
+
+                class="btn edit-btn"
+
+                onclick="openEditSurveyModal({{ survey.id }})"
+
+            >
+
+                <i class="fas fa-edit"></i>
+
+                Edit
+
+            </button>
+
+            <!-- TOGGLE -->
+
+            <form
+
+                method="POST"
+
+                action="{{ url_for('toggle_survey', id=survey.id) }}"
+
+                style="display:inline;"
+
+            >
+
+                <button
+
+                    class="btn toggle-btn"
+
+                    onclick="return confirm('Change survey status?')"
+
+                >
+
+                    {% if survey.active %}
+
+                        Disable
+
+                    {% else %}
+
+                        Enable
+
+                    {% endif %}
+
+                </button>
+
+            </form>
+
+            <!-- DELETE -->
+
+            <form
+
+                method="POST"
+
+                action="{{ url_for('delete_survey', id=survey.id) }}"
+
+                style="display:inline;"
+
+                onsubmit="return confirm('Delete this survey?');"
+
+            >
+
+                <button
+
+                    class="btn delete-btn"
+
+                >
+
+                    <i class="fas fa-trash"></i>
+
+                    Delete
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- CREATE SURVEY MODAL -->
+<!-- ===================================================== -->
+
+<div
+
+id="surveyModal"
+
+style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.55);
+justify-content:center;
+align-items:center;
+z-index:9999;
+"
+
+>
+
+<div
+
+style="
+width:850px;
+max-width:95%;
+background:white;
+border-radius:12px;
+padding:30px;
+max-height:92vh;
+overflow-y:auto;
+"
+
+>
+
+<h2 style="margin-bottom:25px;">
+
+<i class="fas fa-file-alt"></i>
+
+Create Survey
+
+</h2>
+
+<form
+
+method="POST"
+
+action="{{ url_for('surveys') }}"
+
+>
+
+<div
+
+style="
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+"
+
+>
+
+<!-- TITLE -->
+
+<div>
+
+<label>
+
+Survey Title
+
+</label>
+
+<input
+
+type="text"
+
+name="title"
+
+required
+
+style="width:100%;padding:12px;"
+
+>
+
+</div>
+
+<!-- SUBJECT -->
+
+<div>
+
+<label>
+
+Subject
+
+</label>
+
+<select
+
+name="subject"
+
+required
+
+style="width:100%;padding:12px;"
+
+>
+
+<option value="">Select Subject</option>
+
+<option>Mathematics</option>
+
+<option>English</option>
+
+<option>Kiswahili</option>
+
+<option>Biology</option>
+
+<option>Chemistry</option>
+
+<option>Physics</option>
+
+<option>History</option>
+
+<option>Geography</option>
+
+<option>CRE</option>
+
+<option>Business Studies</option>
+
+<option>Computer Studies</option>
+
+<option>Agriculture</option>
+
+</select>
+
+</div>
+
+<!-- GRADE -->
+
+<div>
+
+<label>
+
+Grade
+
+</label>
+
+<select
+
+name="grade"
+
+required
+
+style="width:100%;padding:12px;"
+
+>
+
+<option value="">Select Grade</option>
+
+<option>PRIMARY</option>
+
+<option>SECONDARY</option>
+
+<option>TERTIARY</option>
+
+</select>
+
+</div>
+
+<!-- DURATION -->
+
+<div>
+
+<label>
+
+Duration (Minutes)
+
+</label>
+
+<input
+
+type="number"
+
+name="duration_minutes"
+
+value="30"
+
+min="1"
+
+style="width:100%;padding:12px;"
+
+>
+
+</div>
+
+<!-- PASS -->
+
+<div>
+
+<label>
+
+Passing Percentage
+
+</label>
+
+<input
+
+type="number"
+
+name="passing_percentage"
+
+value="40"
+
+min="1"
+
+max="100"
+
+style="width:100%;padding:12px;"
+
+>
+
+</div>
+
+<!-- ATTEMPTS -->
+
+<div>
+
+<label>
+
+Attempts Allowed
+
+</label>
+
+<input
+
+type="number"
+
+name="attempts_allowed"
+
+value="1"
+
+min="1"
+
+style="width:100%;padding:12px;"
+
+>
+
+</div>
+
+</div>
+
+<br>
+
+<label>
+
+Description
+
+</label>
+
+<textarea
+
+name="description"
+
+rows="4"
+
+style="
+width:100%;
+padding:12px;
+margin-bottom:20px;
+"
+
+></textarea>
+
+<label>
+
+Instructions
+
+</label>
+
+<textarea
+
+name="instructions"
+
+rows="6"
+
+style="
+width:100%;
+padding:12px;
+margin-bottom:20px;
+"
+
+placeholder="Instructions displayed before students begin the survey..."
+
+></textarea>
+
+<h3>
+
+Assign Schools
+
+</h3>
+
+<input
+
+type="text"
+
+id="surveySchoolSearch"
+
+placeholder="Search school..."
+
+style="
+width:100%;
+padding:12px;
+margin:15px 0;
+"
+
+>
+
+<div
+
+id="surveySchoolList"
+
+style="
+height:250px;
+overflow:auto;
+border:1px solid #ddd;
+padding:15px;
+border-radius:8px;
+"
+
+>
+
+{% for school in schools %}
+
+<div class="survey-school-item">
+
+<label>
+
+<input
+
+type="checkbox"
+
+name="schools"
+
+value="{{ school.id }}"
+
+>
+
+{{ school.name }}
+
+</label>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<br>
+
+<label>
+
+<input
+
+type="checkbox"
+
+name="active"
+
+checked
+
+>
+
+Activate Immediately
+
+</label>
+
+<br><br>
+
+<div
+
+style="
+display:flex;
+justify-content:flex-end;
+gap:10px;
+"
+
+>
+
+<button
+
+type="button"
+
+onclick="closeSurveyModal()"
+
+class="btn"
+
+style="background:#6b7280;"
+
+>
+
+Cancel
+
+</button>
+
+<button
+
+type="submit"
+
+class="btn"
+
+style="background:#2563eb;"
+
+>
+
+<i class="fas fa-save"></i>
+
+Save Survey
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+/*****************************************************
+OPEN CREATE MODAL
+*****************************************************/
+
+function openSurveyModal(){
+
+    document.getElementById(
+
+        "surveyModal"
+
+    ).style.display="flex";
+
+}
+
+/*****************************************************
+CLOSE CREATE MODAL
+*****************************************************/
+
+function closeSurveyModal(){
+
+    document.getElementById(
+
+        "surveyModal"
+
+    ).style.display="none";
+
+}
+
+/*****************************************************
+CLICK OUTSIDE TO CLOSE
+*****************************************************/
+
+window.onclick=function(e){
+
+    const modal=
+
+    document.getElementById(
+
+        "surveyModal"
+
+    );
+
+    if(e.target===modal){
+
+        closeSurveyModal();
+
+    }
+
+}
+
+/*****************************************************
+ESC KEY CLOSE
+*****************************************************/
+
+document.addEventListener(
+
+    "keydown",
+
+    function(e){
+
+        if(e.key==="Escape"){
+
+            closeSurveyModal();
+
+        }
+
+    }
+
+);
+
+
+
+/*****************************************************
+SEARCH SURVEYS
+*****************************************************/
+
+document
+
+.getElementById("surveySearch")
+
+.addEventListener(
+
+"keyup",
+
+function(){
+
+    const value=
+
+    this.value.toLowerCase();
+
+    const rows=
+
+    document.querySelectorAll(
+
+        "#surveyTable tr"
+
+    );
+
+    rows.forEach(function(row){
+
+        if(
+
+            row.innerText
+
+            .toLowerCase()
+
+            .includes(value)
+
+        ){
+
+            row.style.display="";
+
+        }
+
+        else{
+
+            row.style.display="none";
+
+        }
+
+    });
+
+});
+
+
+
+/*****************************************************
+SEARCH SCHOOLS
+*****************************************************/
+
+document
+
+.getElementById(
+
+"surveySchoolSearch"
+
+)
+
+.addEventListener(
+
+"keyup",
+
+function(){
+
+    const value=
+
+    this.value.toLowerCase();
+
+    const schools=
+
+    document.querySelectorAll(
+
+        ".survey-school-item"
+
+    );
+
+    schools.forEach(function(item){
+
+        if(
+
+            item.innerText
+
+            .toLowerCase()
+
+            .includes(value)
+
+        ){
+
+            item.style.display="block";
+
+        }
+
+        else{
+
+            item.style.display="none";
+
+        }
+
+    });
+
+});
+
+
+/*****************************************************
+RESET FORM WHEN MODAL CLOSES
+*****************************************************/
+
+function resetSurveyForm(){
+
+    document
+
+    .querySelector(
+
+        "#surveyModal form"
+
+    )
+
+    .reset();
+
+}
+
+const surveyModal=
+
+document.getElementById(
+
+"surveyModal"
+
+);
+
+surveyModal.addEventListener(
+
+"transitionend",
+
+function(){
+
+    if(
+
+        surveyModal.style.display==="none"
+
+    ){
+
+        resetSurveyForm();
+
+    }
+
+});
+
+
+/*****************************************************
+CLOSE + RESET
+*****************************************************/
+
+function closeSurveyModal(){
+
+    resetSurveyForm();
+
+    document.getElementById(
+
+        "surveyModal"
+
+    ).style.display="none";
+
+}
+
+
+/***************************************************
+OPEN EDIT SURVEY
+****************************************************/
+
+async function openEditSurveyModal(id){
+
+    try{
+
+        const response = await fetch(
+
+            "/survey/" + id + "/get"
+
+        );
+
+        const survey = await response.json();
+
+        /*******************************************
+        FORM ACTION
+        ********************************************/
+
+        document
+
+        .getElementById(
+
+            "editSurveyForm"
+
+        )
+
+        .action =
+
+        "/survey/" + id + "/edit";
+
+        /*******************************************
+        BASIC DETAILS
+        ********************************************/
+
+        document.getElementById(
+
+            "edit_id"
+
+        ).value = survey.id;
+
+        document.getElementById(
+
+            "edit_title"
+
+        ).value = survey.title || "";
+
+        document.getElementById(
+
+            "edit_description"
+
+        ).value = survey.description || "";
+
+        document.getElementById(
+
+            "edit_subject"
+
+        ).value = survey.subject || "";
+
+        document.getElementById(
+
+            "edit_grade"
+
+        ).value = survey.grade || "";
+
+        document.getElementById(
+
+            "edit_duration"
+
+        ).value = survey.duration_minutes;
+
+        document.getElementById(
+
+            "edit_instructions"
+
+        ).value = survey.instructions || "";
+
+        document.getElementById(
+
+            "edit_passing"
+
+        ).value = survey.passing_percentage;
+
+        document.getElementById(
+
+            "edit_attempts"
+
+        ).value = survey.attempts_allowed;
+
+        document.getElementById(
+
+            "edit_active"
+
+        ).checked = survey.active;
+
+        /*******************************************
+        CLEAR SCHOOL CHECKBOXES
+        ********************************************/
+
+        document
+
+        .querySelectorAll(".edit-school")
+
+        .forEach(function(box){
+
+            box.checked = false;
+
+        });
+
+        /*******************************************
+        TICK ASSIGNED SCHOOLS
+        ********************************************/
+
+        survey.schools.forEach(function(id){
+
+            const checkbox = document.querySelector(
+
+                '.edit-school[value="' + id + '"]'
+
+            );
+
+            if(checkbox){
+
+                checkbox.checked = true;
+
+            }
+
+        });
+
+        /*******************************************
+        SHOW MODAL
+        ********************************************/
+
+        document.getElementById(
+
+            "editSurveyModal"
+
+        ).style.display = "flex";
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        alert(
+
+            "Unable to load survey."
+
+        );
+
+    }
+
+}
+
+/***************************************************
+CLOSE EDIT MODAL
+****************************************************/
+
+function closeEditSurveyModal(){
+
+    document.getElementById(
+
+        "editSurveyModal"
+
+    ).style.display = "none";
+
+}
+
+/***************************************************
+CLICK OUTSIDE
+****************************************************/
+
+window.addEventListener(
+
+    "click",
+
+    function(e){
+
+        const modal =
+
+        document.getElementById(
+
+            "editSurveyModal"
+
+        );
+
+        if(e.target === modal){
+
+            closeEditSurveyModal();
+
+        }
+
+    }
+
+);
+
+/***************************************************
+ESC KEY
+****************************************************/
+
+document.addEventListener(
+
+    "keydown",
+
+    function(e){
+
+        if(
+
+            e.key === "Escape"
+
+        ){
+
+            closeEditSurveyModal();
+
+        }
+
+    }
+
+);
+
+
+</script>
+<!-- ===================================================== -->
+<!-- EDIT SURVEY MODAL -->
+<!-- ===================================================== -->
+
+<div
+    id="editSurveyModal"
+    style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,.55);
+        justify-content:center;
+        align-items:center;
+        z-index:9999;
+    "
+>
+
+<div
+    style="
+        width:850px;
+        max-width:95%;
+        background:white;
+        border-radius:12px;
+        padding:30px;
+        max-height:92vh;
+        overflow-y:auto;
+    "
+>
+
+<h2>
+
+    ✏ Edit Survey
+
+</h2>
+
+<form
+
+    id="editSurveyForm"
+
+    method="POST"
+
+>
+
+<input
+
+type="hidden"
+
+id="edit_id"
+
+name="id"
+
+>
+
+<div
+style="
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+">
+
+<div>
+
+<label>
+
+Title
+
+</label>
+
+<input
+
+type="text"
+
+id="edit_title"
+
+name="title"
+
+required
+
+style="width:100%;padding:12px;">
+
+</div>
+
+<div>
+
+<label>
+
+Subject
+
+</label>
+
+<select
+
+id="edit_subject"
+
+name="subject"
+
+style="width:100%;padding:12px;">
+
+<option>Mathematics</option>
+
+<option>English</option>
+
+<option>Kiswahili</option>
+
+<option>Biology</option>
+
+<option>Chemistry</option>
+
+<option>Physics</option>
+
+<option>History</option>
+
+<option>Geography</option>
+
+<option>CRE</option>
+
+<option>Business Studies</option>
+
+<option>Computer Studies</option>
+
+<option>Agriculture</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>
+
+Grade
+
+</label>
+
+<select
+
+id="edit_grade"
+
+name="grade"
+
+style="width:100%;padding:12px;">
+
+<option>PRIMARY</option>
+
+<option>SECONDARY</option>
+
+<option>TERTIARY</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>
+
+Duration (Minutes)
+
+</label>
+
+<input
+
+type="number"
+
+id="edit_duration"
+
+name="duration_minutes"
+
+style="width:100%;padding:12px;">
+
+</div>
+
+<div>
+
+<label>
+
+Passing %
+
+</label>
+
+<input
+
+type="number"
+
+id="edit_passing"
+
+name="passing_percentage"
+
+style="width:100%;padding:12px;">
+
+</div>
+
+<div>
+
+<label>
+
+Attempts
+
+</label>
+
+<input
+
+type="number"
+
+id="edit_attempts"
+
+name="attempts_allowed"
+
+style="width:100%;padding:12px;">
+
+</div>
+
+</div>
+
+<br>
+
+<label>
+
+Description
+
+</label>
+
+<textarea
+
+id="edit_description"
+
+name="description"
+
+rows="4"
+
+style="width:100%;padding:12px;"
+
+></textarea>
+
+<br><br>
+
+<label>
+
+Instructions
+
+</label>
+
+<textarea
+
+id="edit_instructions"
+
+name="instructions"
+
+rows="6"
+
+style="width:100%;padding:12px;"
+
+></textarea>
+
+<br><br>
+
+<h3>
+
+Assigned Schools
+
+</h3>
+
+<div
+
+style="
+max-height:220px;
+overflow:auto;
+border:1px solid #ddd;
+padding:15px;
+border-radius:8px;
+"
+
+>
+
+{% for school in schools %}
+
+<div>
+
+<label>
+
+<input
+
+type="checkbox"
+
+class="edit-school"
+
+name="schools"
+
+value="{{ school.id }}"
+
+>
+
+{{ school.name }}
+
+</label>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<br>
+
+<label>
+
+<input
+
+type="checkbox"
+
+id="edit_active"
+
+name="active"
+
+>
+
+Active
+
+</label>
+
+<br><br>
+
+<div
+
+style="
+display:flex;
+justify-content:flex-end;
+gap:10px;
+"
+
+>
+
+<button
+
+type="button"
+
+onclick="closeEditSurveyModal()"
+
+class="btn"
+
+style="background:#6b7280;"
+
+>
+
+Cancel
+
+</button>
+
+<button
+
+class="btn"
+
+style="background:#2563eb;"
+
+>
+
+💾 Save Changes
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</body>
