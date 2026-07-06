@@ -131,60 +131,48 @@ def system_login():
 
     if request.method == "POST":
 
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
 
-        admin = SystemAdmin.query.filter_by(username=username).first()
+        admin = SystemAdmin.query.filter_by(
+            username=username
+        ).first()
 
         if not admin:
-            flash("Invalid credentials", "danger")
+            flash("Invalid credentials.", "danger")
             return redirect(url_for("system_login"))
 
-        # check password
         if not check_password_hash(admin.password, password):
-            flash("Invalid credentials", "danger")
+            flash("Invalid credentials.", "danger")
             return redirect(url_for("system_login"))
 
-        # OPTIONAL: OTP CHECK (if enabled later)
-        # if admin.otp_code:
-        #     redirect to OTP verification step
-
-        # -----------------------------------
-        # SYSTEM SESSION (ISOLATED)
-        # -----------------------------------
-        session.clear()  # important: avoid session mixing
-
+        # ONLY CREATE SYSTEM SESSION
         session["system_admin_id"] = admin.id
         session["system_admin_logged_in"] = True
 
-        flash("System login successful", "success")
+        flash("System login successful.", "success")
 
         return redirect(url_for("manage_schools"))
 
     return render_template("login.html")
 
-from functools import wraps
-from flask import session, redirect, url_for, flash
-from models import SystemAdmin
+
 
 def system_admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
 
-        # MUST exist
-        system_admin_id = session.get("system_admin_id")
+        system = session.get("system")
 
-        # MUST NOT be school admin
-        school_admin_id = session.get("school_admin_id")
-
-        if not system_admin_id:
-            flash("System admin login required.", "warning")
+        if not system:
+            flash("Please log in as a system administrator.", "warning")
             return redirect(url_for("system_login"))
 
-        # 🚨 BLOCK SCHOOL ADMINS COMPLETELY
-        if school_admin_id:
-            session.clear()
-            flash("Unauthorized access detected.", "danger")
+        admin = SystemAdmin.query.get(system["admin_id"])
+
+        if not admin:
+            session.pop("system", None)
+            flash("Your session has expired.", "warning")
             return redirect(url_for("system_login"))
 
         return f(*args, **kwargs)
@@ -219,24 +207,24 @@ def school_login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
 
-        school_admin_id = session.get("school_admin_id")
-        system_admin_id = session.get("system_admin_id")
+        school = session.get("school")
 
-        if not school_admin_id:
-            flash("School admin login required.", "warning")
+        if not school:
+            flash("Please log in as a school administrator.", "warning")
             return redirect(url_for("school_login"))
 
-        # 🚨 BLOCK SYSTEM ADMINS FROM SCHOOL AREA
-        if system_admin_id:
-            session.clear()
-            flash("Unauthorized access detected.", "danger")
+        admin = SchoolAdmin.query.get(school["admin_id"])
+
+        if not admin:
+            session.pop("school", None)
+            flash("Your session has expired.", "warning")
             return redirect(url_for("school_login"))
 
         return f(*args, **kwargs)
 
     return wrapper
 
-from flask import session, redirect, url_for, flash
+
 
 @app.route("/school/logout")
 def school_logout():
