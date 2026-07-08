@@ -291,6 +291,22 @@ def school_logout():
 
     return redirect(url_for("school_login"))
 
+@app.route("/admin/logout")
+def admin_logout():
+
+    for key in list(session.keys()):
+
+        if key.startswith("system_admin"):
+
+            session.pop(key, None)
+
+    flash(
+        "Logged out successfully.",
+        "success"
+    )
+
+    return redirect(url_for("system_login"))
+
 @app.route("/users", methods=["GET", "POST"])
 @system_admin_required
 def manage_users():
