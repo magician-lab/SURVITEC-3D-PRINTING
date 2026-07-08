@@ -81,6 +81,24 @@ TOP BAR
     border-radius:8px;
 }
 
+.logout-btn{
+
+    background:#961010;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:10px 15px;
+
+    border-radius:8px;
+}
+
+.logout-btn:hover{
+
+    opacity:.9;
+}
+
 .back-btn:hover{
 
     opacity:.9;
@@ -447,7 +465,13 @@ RESPONSIVE
 <h1>School Management</h1>
 
 <div class="top-bar">
-
+    <a
+        href="/admin/logout"
+        class="logout-btn"
+    >
+        logout
+    </a>
+    
     <a
         href="/school_admins"
         class="back-btn"
