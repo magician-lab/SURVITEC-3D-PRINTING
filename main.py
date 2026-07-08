@@ -16,9 +16,23 @@ from flask import send_file
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+from dotenv import load_dotenv
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+load_dotenv()
+
+import os
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+
+    "pool_pre_ping": True,
+
+    "pool_recycle": 300
+
+}
 app.config['SECRET_KEY'] = 'supersecretkey123'
 
 db.init_app(app)
