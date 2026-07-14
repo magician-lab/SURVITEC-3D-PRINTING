@@ -4036,7 +4036,13 @@ def school_login():
         if not school:
             flash("Invalid school code", "danger")
             return redirect(url_for("school_login"))
+            
+        if not school.active:
 
+            flash(
+                "This school account has been disabled.",
+                "danger"
+            )
         # ------------------------------------
         # 2. FIND ADMIN INSIDE SCHOOL
         # ------------------------------------
