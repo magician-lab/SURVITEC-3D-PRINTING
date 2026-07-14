@@ -4039,10 +4039,7 @@ def school_login():
             
         if not school.active:
 
-            flash(
-                "This school account has been disabled.",
-                "danger"
-            )
+            flash("This school account has been disabled","danger")
             return redirect(url_for("school_login"))
         # ------------------------------------
         # 2. FIND ADMIN INSIDE SCHOOL
@@ -4055,7 +4052,10 @@ def school_login():
         if not admin:
             flash("Invalid username or password", "danger")
             return redirect(url_for("school_login"))
-
+            
+        if not admin.active:
+            flash("your account suspended contact survitec 3d", "danger")
+            return redirect(url_for("school_login"))
         # ------------------------------------
         # 3. CHECK PASSWORD
         # ------------------------------------
