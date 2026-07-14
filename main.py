@@ -4054,7 +4054,7 @@ def school_login():
             return redirect(url_for("school_login"))
             
         if not admin.active:
-            flash("Your account has been suspended , Kindly contact Survitec 3d", "danger")
+            flash("Your account has been suspended . Kindly contact Survitec 3D", "danger")
             return redirect(url_for("school_login"))
         # ------------------------------------
         # 3. CHECK PASSWORD
