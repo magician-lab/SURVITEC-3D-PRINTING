@@ -4043,6 +4043,7 @@ def school_login():
                 "This school account has been disabled.",
                 "danger"
             )
+            return redirect(url_for("school_login"))
         # ------------------------------------
         # 2. FIND ADMIN INSIDE SCHOOL
         # ------------------------------------
