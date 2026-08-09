@@ -1,0 +1,156 @@
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Waiting for Approval</title>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+
+body{
+
+background:#f8fbff;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+height:100vh;
+
+font-family:Segoe UI;
+
+}
+
+.card{
+
+width:90%;
+
+max-width:700px;
+
+background:white;
+
+padding:45px;
+
+text-align:center;
+
+border-radius:15px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.icon{
+
+font-size:90px;
+
+color:#2563eb;
+
+margin-bottom:20px;
+
+}
+
+.badge{
+
+display:inline-block;
+
+padding:10px 18px;
+
+background:#dbeafe;
+
+color:#1d4ed8;
+
+border-radius:25px;
+
+margin:20px;
+
+font-weight:bold;
+
+}
+
+.btn{
+
+display:inline-block;
+
+margin-top:30px;
+
+padding:14px 35px;
+
+background:#16a34a;
+
+color:white;
+
+text-decoration:none;
+
+border-radius:8px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="icon">
+
+<i class="fas fa-envelope-open-text"></i>
+
+</div>
+
+<h2>
+
+Waiting For Parent Approval
+
+</h2>
+
+<div class="badge">
+
+Consent Email Sent
+
+</div>
+
+<p>
+
+A secure consent link has been sent to
+
+<strong>
+
+{{ email }}
+
+</strong>
+
+</p>
+
+<p>
+
+The link remains valid for
+
+48 Hours.
+
+</p>
+
+<a
+
+class="btn"
+
+href="{{ url_for('send_parent_consent', token=token.token) }}">
+
+Resend Email
+
+</a>
+
+</div>
+
+</body>
+
+</html>
+```

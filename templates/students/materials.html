@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+
+Reading Materials
+
+</title>
+
+<link
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+rel="stylesheet"
+>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+background:#f4f7fb;
+}
+
+.container{
+
+width:95%;
+
+max-width:1300px;
+
+margin:auto;
+
+padding:35px;
+
+}
+
+.header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:30px;
+
+flex-wrap:wrap;
+
+gap:15px;
+
+}
+
+.header h1{
+
+color:#1e3a8a;
+
+font-size:32px;
+
+}
+
+.header p{
+
+color:#64748b;
+
+margin-top:5px;
+
+}
+
+.back-btn{
+
+background:#2563eb;
+
+color:white;
+
+padding:12px 22px;
+
+border-radius:8px;
+
+text-decoration:none;
+
+font-weight:bold;
+
+}
+
+.back-btn:hover{
+
+background:#1d4ed8;
+
+}
+
+.toolbar{
+
+display:flex;
+
+gap:15px;
+
+margin-bottom:30px;
+
+flex-wrap:wrap;
+
+}
+
+.toolbar input{
+
+flex:1;
+
+padding:14px;
+
+border:1px solid #d1d5db;
+
+border-radius:8px;
+
+font-size:15px;
+
+}
+
+.toolbar select{
+
+padding:14px;
+
+border-radius:8px;
+
+border:1px solid #d1d5db;
+
+}
+
+.grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+
+gap:25px;
+
+}
+
+.card{
+
+background:white;
+
+border-radius:14px;
+
+padding:25px;
+
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+transition:.3s;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:space-between;
+
+}
+
+.card:hover{
+
+transform:translateY(-6px);
+
+}
+
+.icon{
+
+font-size:42px;
+
+margin-bottom:15px;
+
+color:#2563eb;
+
+}
+
+.title{
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#1e293b;
+
+margin-bottom:10px;
+
+}
+
+.meta{
+
+display:flex;
+
+justify-content:space-between;
+
+margin-bottom:15px;
+
+color:#64748b;
+
+font-size:14px;
+
+}
+
+.desc{
+
+color:#475569;
+
+line-height:1.6;
+
+margin-bottom:20px;
+
+min-height:75px;
+
+}
+
+.footer{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+}
+
+.date{
+
+font-size:13px;
+
+color:#94a3b8;
+
+}
+
+.open-btn{
+
+background:#2563eb;
+
+color:white;
+
+padding:10px 18px;
+
+border-radius:8px;
+
+text-decoration:none;
+
+font-weight:bold;
+
+}
+
+.open-btn:hover{
+
+background:#1d4ed8;
+
+}
+
+.empty{
+
+background:white;
+
+padding:70px;
+
+text-align:center;
+
+border-radius:14px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+color:#64748b;
+
+}
+
+.empty i{
+
+font-size:70px;
+
+margin-bottom:20px;
+
+color:#cbd5e1;
+
+}
+
+@media(max-width:768px){
+
+.grid{
+
+grid-template-columns:1fr;
+
+}
+
+.header{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<div>
+
+<h1>
+
+📚 Reading Materials
+
+</h1>
+
+<p>
+
+Welcome {{ student.fullname }}
+
+</p>
+
+</div>
+
+<a
+
+href="{{ url_for('student_dashboard') }}"
+
+class="back-btn"
+
+>
+
+← Dashboard
+
+</a>
+
+</div>
+
+<div class="toolbar">
+
+<input
+
+type="text"
+
+id="search"
+
+placeholder="Search materials..."
+
+>
+
+<select id="subjectFilter">
+
+<option value="">
+
+All Subjects
+
+</option>
+
+{% for material in materials|groupby("subject") %}
+
+<option value="{{ material.grouper }}">
+
+{{ material.grouper }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+{% if materials %}
+
+<div class="grid">
+
+{% for material in materials %}
+
+<div
+
+class="card"
+
+data-title="{{ material.title|lower }}"
+
+data-subject="{{ material.subject }}"
+
+>
+
+<div>
+
+<div class="icon">
+
+{% set ext = material.file_name.split('.')[-1].lower() %}
+
+{% if ext=="pdf" %}
+
+<i class="fas fa-file-pdf"></i>
+
+{% elif ext in ["doc","docx"] %}
+
+<i class="fas fa-file-word"></i>
+
+{% elif ext in ["xls","xlsx"] %}
+
+<i class="fas fa-file-excel"></i>
+
+{% elif ext in ["ppt","pptx"] %}
+
+<i class="fas fa-file-powerpoint"></i>
+
+{% elif ext=="zip" %}
+
+<i class="fas fa-file-archive"></i>
+
+{% elif ext=="mp4" %}
+
+<i class="fas fa-file-video"></i>
+
+{% else %}
+
+<i class="fas fa-file"></i>
+
+{% endif %}
+
+</div>
+
+<div class="title">
+
+{{ material.title }}
+
+</div>
+
+<div class="meta">
+
+<span>
+
+{{ material.subject }}
+
+</span>
+
+<span>
+
+{{ material.grade }}
+
+</span>
+
+</div>
+
+<div class="desc">
+
+{{ material.description or "No description available." }}
+
+</div>
+
+</div>
+
+<div class="footer">
+
+<div class="date">
+
+{{ material.uploaded_at.strftime("%d %b %Y") }}
+
+</div>
+
+<a
+    href="{{ url_for('view_material', id=material.id) }}"
+    class="open-btn"
+    target="_blank"
+>
+    📖 Open
+</a>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="empty">
+
+<i class="fas fa-folder-open"></i>
+
+<h2>
+
+No Reading Materials
+
+</h2>
+
+<p>
+
+Your school has not been assigned any learning materials yet.
+
+</p>
+
+</div>
+
+{% endif %}
+
+</div>
+
+<script>
+
+const search=document.getElementById("search");
+
+const filter=document.getElementById("subjectFilter");
+
+function filterCards(){
+
+const keyword=search.value.toLowerCase();
+
+const subject=filter.value;
+
+document.querySelectorAll(".card").forEach(card=>{
+
+const title=card.dataset.title;
+
+const sub=card.dataset.subject;
+
+const show=
+
+title.includes(keyword)
+
+&&
+
+(subject==="" || sub===subject);
+
+card.style.display=show?"flex":"none";
+
+});
+
+}
+
+search.addEventListener("keyup",filterCards);
+
+filter.addEventListener("change",filterCards);
+
+</script>
+
+</body>
+
+</html>
