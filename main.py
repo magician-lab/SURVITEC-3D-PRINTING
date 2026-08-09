@@ -154,58 +154,141 @@ def kenya_datetime(dt):
 @app.route("/system/login", methods=["GET", "POST"])
 def system_login():
 
-    # -----------------------------------
+    # ==========================================
     # ALREADY LOGGED IN?
-    # -----------------------------------
+    # ==========================================
+
     if session.get("system_admin_id"):
-        return redirect(url_for("manage_schools"))
+
+        return redirect(
+            url_for("manage_schools")
+        )
+
+
+    # ==========================================
+    # HANDLE LOGIN
+    # ==========================================
 
     if request.method == "POST":
 
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
+        username = request.form.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+
+        # ======================================
+        # VALIDATE INPUT
+        # ======================================
 
         if not username or not password:
-            flash("Username and password are required.", "warning")
-            return render_template("login.html")
 
-        # -----------------------------------
-        # FIND ADMIN
-        # -----------------------------------
+            flash(
+                "Username and password are required.",
+                "warning"
+            )
+
+            return render_template(
+                "login.html"
+            )
+
+
+        # ======================================
+        # FIND ADMIN BY USERNAME
+        # ======================================
+
         admin = SystemAdmin.query.filter_by(
             username=username
         ).first()
 
+
         if admin is None:
-            flash("Invalid username or password.", "danger")
-            return render_template("login.html")
 
-        # -----------------------------------
+            flash(
+                "Invalid username or password.",
+                "danger"
+            )
+
+            return render_template(
+                "login.html"
+            )
+
+
+        # ======================================
         # VERIFY PASSWORD
-        # -----------------------------------
-        if not check_password_hash(admin.password, password):
-            flash("Invalid username or password.", "danger")
-            return render_template("login.html")
+        # ======================================
 
-        # -----------------------------------
-        # CREATE SYSTEM SESSION
-        # -----------------------------------
-        session["system_admin_id"] = admin.id
+        if not check_password_hash(
+            admin.password,
+            password
+        ):
+
+            flash(
+                "Invalid username or password.",
+                "danger"
+            )
+
+            return render_template(
+                "login.html"
+            )
+
+
+        # ======================================
+        # CREATE UUID-BASED SESSION
+        # ======================================
+
+        session["system_admin_id"] = str(
+            admin.id
+        )
+
         session["system_admin_logged_in"] = True
 
-        # Optional but recommended
         session.permanent = True
         session.modified = True
 
-        # Debug (remove later)
-        print("SYSTEM LOGIN SESSION:", dict(session))
 
-        flash("Welcome back!", "success")
+        # ======================================
+        # DEBUG
+        # ======================================
 
-        return redirect(url_for("manage_schools"))
+        print(
+            "SYSTEM ADMIN ID:",
+            admin.id,
+            type(admin.id)
+        )
 
-    return render_template("login.html")
+        print(
+            "SYSTEM LOGIN SESSION:",
+            dict(session)
+        )
 
+
+        # ======================================
+        # SUCCESS
+        # ======================================
+
+        flash(
+            "Welcome back!",
+            "success"
+        )
+
+        return redirect(
+            url_for("manage_schools")
+        )
+
+
+    # ==========================================
+    # LOGIN PAGE
+    # ==========================================
+
+    return render_template(
+        "login.html"
+    )
 
 
 
