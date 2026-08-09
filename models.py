@@ -817,45 +817,6 @@ class Result(db.Model):
     )
 
 
-# ==========================================================
-# SUBSCRIPTION
-# ==========================================================
-
-class Subscription(db.Model):
-
-    __tablename__ = "subscriptions"
-
-    id = db.Column(
-        db.String(36),
-        primary_key=True,
-        default=generate_uuid
-    )
-
-    school_id = db.Column(
-        db.String(36),
-        db.ForeignKey(
-            "schools.id",
-            ondelete="CASCADE"
-        ),
-        nullable=True
-    )
-
-    amount = db.Column(
-        db.Float
-    )
-
-    start_date = db.Column(
-        db.Date
-    )
-
-    expiry_date = db.Column(
-        db.Date
-    )
-
-    status = db.Column(
-        db.String(20)
-    )
-
 
 # ==========================================================
 # CONSENT
