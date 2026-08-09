@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Results</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+}
+
+.container{
+width:95%;
+max-width:1200px;
+margin:30px auto;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.header h2{
+color:#1e3a8a;
+}
+
+.btn{
+padding:10px 20px;
+background:#2563eb;
+color:white;
+text-decoration:none;
+border-radius:8px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+th{
+background:#2563eb;
+color:white;
+padding:15px;
+}
+
+td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #eee;
+}
+
+tr:hover{
+background:#f8fbff;
+}
+
+.grade{
+
+padding:6px 15px;
+
+border-radius:20px;
+
+color:white;
+
+font-weight:bold;
+
+display:inline-block;
+
+}
+
+.A{background:#16a34a;}
+.B{background:#2563eb;}
+.C{background:#f59e0b;}
+.D{background:#ea580c;}
+.E{background:#dc2626;}
+
+.view{
+
+background:#16a34a;
+
+padding:8px 16px;
+
+color:white;
+
+text-decoration:none;
+
+border-radius:6px;
+
+}
+
+.empty{
+
+background:white;
+
+padding:40px;
+
+text-align:center;
+
+border-radius:10px;
+
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h2>📊 My Results</h2>
+
+<a href="{{ url_for('student_dashboard') }}" class="btn">
+
+← Dashboard
+
+</a>
+
+</div>
+
+{% if results %}
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Survey</th>
+
+<th>Score</th>
+
+<th>Percentage</th>
+
+<th>Grade</th>
+
+<th>Date</th>
+
+
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for result in results %}
+
+<tr>
+
+<td>
+
+{{ result.survey.title }}
+
+</td>
+
+<td>
+
+{{ result.score }}/{{ result.total_questions }}
+
+</td>
+
+<td>
+
+{{ result.percentage }}%
+
+</td>
+
+<td>
+
+<span class="grade {{ result.grade }}">
+
+{{ result.grade }}
+
+</span>
+
+</td>
+
+<td>
+
+{{ result.completed_at.strftime("%d %b %Y") }}
+
+</td>
+
+
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<div class="empty">
+
+<h3>No Results Yet</h3>
+
+<p>
+
+Complete a survey to see your results here.
+
+</p>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{{ consent.title }}</title>
+
+<link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    rel="stylesheet"
+>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+    background: #eef3f9;
+    padding: 40px;
+    color: #1f2937;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+/* HEADER */
+
+.header {
+    background: linear-gradient(
+        135deg,
+        #1e3a8a,
+        #2563eb
+    );
+
+    color: #ffffff;
+    padding: 30px;
+}
+
+.header h2 {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.header p {
+    opacity: .9;
+}
+
+/* INFORMATION */
+
+.info {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 15px;
+
+    padding: 25px;
+
+    background: #f8fbff;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.info-box {
+    background: #ffffff;
+
+    padding: 18px;
+
+    border-radius: 10px;
+
+    border: 1px solid #e5e7eb;
+}
+
+.info-box small {
+    display: block;
+
+    color: #666;
+
+    margin-bottom: 5px;
+}
+
+.info-box strong {
+    font-size: 16px;
+}
+
+/* SECURITY NOTICE */
+
+.notice {
+    margin: 25px;
+
+    padding: 18px;
+
+    border-left: 5px solid #f59e0b;
+
+    background: #fff7ed;
+
+    border-radius: 8px;
+
+    line-height: 1.6;
+}
+
+.notice i {
+    margin-right: 10px;
+
+    color: #f59e0b;
+}
+
+/* CONTENT */
+
+.content {
+    padding: 30px;
+}
+
+.content-title {
+    margin-bottom: 15px;
+
+    color: #1e3a8a;
+
+    font-size: 20px;
+}
+
+/* POLICY */
+
+.policy-wrapper {
+    position: relative;
+}
+
+.policy {
+    height: 420px;
+
+    overflow-y: auto;
+
+    padding: 25px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    background: #fafafa;
+
+    line-height: 1.8;
+
+    white-space: pre-wrap;
+
+    scroll-behavior: smooth;
+}
+
+/* SCROLLBAR */
+
+.policy::-webkit-scrollbar {
+    width: 9px;
+}
+
+.policy::-webkit-scrollbar-track {
+    background: #e5e7eb;
+
+    border-radius: 10px;
+}
+
+.policy::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+
+    border-radius: 10px;
+}
+
+.policy::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* SCROLL MESSAGE */
+
+.scroll-message {
+
+    margin-top: 12px;
+
+    padding: 12px;
+
+    text-align: center;
+
+    background: #eff6ff;
+
+    color: #1d4ed8;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    transition: .3s;
+}
+
+.scroll-message i {
+
+    margin-right: 6px;
+
+}
+
+/* WHEN REACHED */
+
+.scroll-message.completed {
+
+    background: #ecfdf5;
+
+    color: #15803d;
+
+}
+
+.scroll-message.completed i {
+
+    color: #16a34a;
+
+}
+
+/* ACTIONS */
+
+.actions {
+
+    padding: 30px;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 20px;
+
+    background: #f9fafb;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+/* BUTTON BASE */
+
+button {
+
+    padding: 14px 40px;
+
+    font-size: 16px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+    transition: .3s;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+}
+
+/* DISABLED */
+
+button:disabled {
+
+    cursor: not-allowed;
+
+    opacity: .45;
+
+    filter: grayscale(30%);
+
+}
+
+/* ENABLED BUTTONS */
+
+button:not(:disabled) {
+
+    cursor: pointer;
+
+}
+
+/* AGREE */
+
+.agree {
+
+    background: #16a34a;
+
+    color: #ffffff;
+}
+
+.agree:not(:disabled):hover {
+
+    background: #15803d;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 15px rgba(22,163,74,.25);
+}
+
+/* DECLINE */
+
+.decline {
+
+    background: #dc2626;
+
+    color: #ffffff;
+}
+
+.decline:not(:disabled):hover {
+
+    background: #b91c1c;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 15px rgba(220,38,38,.25);
+}
+
+/* FOOTER */
+
+.footer {
+
+    padding: 20px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+    color: #777;
+
+}
+
+/* MOBILE */
+
+@media(max-width:700px) {
+
+    body {
+
+        padding: 15px;
+
+    }
+
+    .header h2 {
+
+        font-size: 24px;
+
+    }
+
+    .content {
+
+        padding: 20px;
+
+    }
+
+    .actions {
+
+        flex-direction: column;
+
+        padding: 20px;
+
+    }
+
+    button {
+
+        width: 100%;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<!-- HEADER -->
+
+<div class="header">
+
+<h2>
+
+<i class="fas fa-file-contract"></i>
+
+{{ consent.title }}
+
+</h2>
+
+<p>
+
+Version {{ consent.version }}
+
+</p>
+
+</div>
+
+<!-- INFORMATION -->
+
+<div class="info">
+
+<div class="info-box">
+
+<small>
+
+Recipient
+
+</small>
+
+<strong>
+
+{{ user_name }}
+
+</strong>
+
+</div>
+
+<div class="info-box">
+
+<small>
+
+User Type
+
+</small>
+
+<strong>
+
+{{ token.user_type }}
+
+</strong>
+
+</div>
+
+<div class="info-box">
+
+<small>
+
+Expires
+
+</small>
+
+<strong>
+
+{{ token.expires_at.strftime(
+"%d %B %Y %I:%M %p"
+) }}
+
+</strong>
+
+</div>
+
+<div class="info-box">
+
+<small>
+
+Status
+
+</small>
+
+<strong>
+
+{{ token.status }}
+
+</strong>
+
+</div>
+
+</div>
+
+<!-- SECURITY NOTICE -->
+
+<div class="notice">
+
+<i class="fas fa-shield-alt"></i>
+
+For security and compliance purposes, opening this page has been recorded.
+
+Your public IP address, approximate location, browser, operating system,
+device information, and access time may be logged.
+
+If you allow browser location access, your precise GPS location may also
+be recorded.
+
+</div>
+
+<!-- CONTENT -->
+
+<div class="content">
+
+<h3 class="content-title">
+
+<i class="fas fa-scroll"></i>
+
+Consent Agreement
+
+</h3>
+
+<div class="policy-wrapper">
+
+<div
+    class="policy"
+    id="consentContent"
+>
+
+{{ consent.content }}
+
+</div>
+
+<div
+    class="scroll-message"
+    id="scrollMessage"
+>
+
+<i class="fas fa-arrow-down"></i>
+
+Please scroll to the bottom of the agreement to continue.
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ACTIONS -->
+
+<form method="POST">
+
+<div class="actions">
+
+<button
+
+```
+type="submit"
+
+name="action"
+
+value="agree"
+
+class="agree"
+
+id="agreeButton"
+
+disabled
+```
+
+>
+
+<i class="fas fa-check-circle"></i>
+
+I Agree
+
+</button>
+
+<button
+
+```
+type="submit"
+
+name="action"
+
+value="decline"
+
+class="decline"
+
+id="declineButton"
+
+disabled
+```
+
+>
+
+<i class="fas fa-times-circle"></i>
+
+I Do Not Agree
+
+</button>
+
+</div>
+
+</form>
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+SURVITEC Learning Platform
+•
+Consent Management System
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/*
+=========================================================
+CONSENT SCROLL REQUIREMENT
+=========================================================
+
+The Accept and Decline buttons remain disabled until
+the user reaches the bottom of the consent document.
+=========================================================
+*/
+
+const consentContent =
+    document.getElementById(
+        "consentContent"
+    );
+
+const agreeButton =
+    document.getElementById(
+        "agreeButton"
+    );
+
+const declineButton =
+    document.getElementById(
+        "declineButton"
+    );
+
+const scrollMessage =
+    document.getElementById(
+        "scrollMessage"
+    );
+
+
+function enableConsentActions() {
+
+    agreeButton.disabled = false;
+
+    declineButton.disabled = false;
+
+    scrollMessage.classList.add(
+        "completed"
+    );
+
+    scrollMessage.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        You have reached the end of the agreement.
+        You may now choose Accept or Decline.
+    `;
+}
+
+
+/*
+=========================================================
+CHECK WHETHER USER HAS REACHED THE BOTTOM
+=========================================================
+*/
+
+function checkScrollPosition() {
+
+    const scrollTop =
+        consentContent.scrollTop;
+
+    const visibleHeight =
+        consentContent.clientHeight;
+
+    const totalHeight =
+        consentContent.scrollHeight;
+
+
+    /*
+    Small tolerance is used because browsers can
+    calculate fractional pixel values.
+    */
+
+    const tolerance = 5;
+
+
+    if (
+        scrollTop + visibleHeight
+        >= totalHeight - tolerance
+    ) {
+
+        enableConsentActions();
+
+    }
+
+}
+
+
+/*
+=========================================================
+LISTEN FOR SCROLL
+=========================================================
+*/
+
+consentContent.addEventListener(
+    "scroll",
+    checkScrollPosition
+);
+
+
+/*
+=========================================================
+INITIAL CHECK
+=========================================================
+
+If the agreement is short enough that it does not
+require scrolling, automatically enable the buttons.
+=========================================================
+*/
+
+window.addEventListener(
+    "load",
+    checkScrollPosition
+);
+
+</script>
+
+</body>
+
+</html>

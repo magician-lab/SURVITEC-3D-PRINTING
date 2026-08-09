@@ -1,0 +1,600 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Consent Management</title>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Segoe UI",Tahoma,sans-serif;
+}
+
+body{
+background:#f4f7fb;
+color:#333;
+}
+
+.container{
+width:96%;
+max-width:1500px;
+margin:30px auto;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.header h2{
+color:#1d4ed8;
+font-size:28px;
+}
+
+.btn{
+padding:12px 22px;
+background:#2563eb;
+color:white;
+text-decoration:none;
+border-radius:8px;
+font-weight:600;
+}
+
+.btn:hover{
+background:#1d4ed8;
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+gap:18px;
+
+margin-bottom:25px;
+
+}
+
+.card{
+
+background:white;
+
+padding:20px;
+
+border-radius:12px;
+
+box-shadow:0 4px 12px rgba(0,0,0,.06);
+
+}
+
+.card h3{
+
+font-size:14px;
+
+color:#666;
+
+margin-bottom:10px;
+
+}
+
+.card h1{
+
+color:#1d4ed8;
+
+}
+
+.filters{
+
+background:white;
+
+padding:20px;
+
+border-radius:12px;
+
+margin-bottom:25px;
+
+display:flex;
+
+gap:15px;
+
+flex-wrap:wrap;
+
+box-shadow:0 4px 12px rgba(0,0,0,.06);
+
+}
+
+.filters input,
+
+.filters select{
+
+padding:10px;
+
+border:1px solid #ccc;
+
+border-radius:8px;
+
+min-width:220px;
+
+}
+
+.filters button{
+
+padding:10px 20px;
+
+border:none;
+
+background:#2563eb;
+
+color:white;
+
+border-radius:8px;
+
+cursor:pointer;
+
+}
+
+.table-wrapper{
+
+background:white;
+
+border-radius:12px;
+
+overflow:hidden;
+
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th{
+
+background:#2563eb;
+
+color:white;
+
+padding:15px;
+
+text-align:left;
+
+}
+
+td{
+
+padding:14px;
+
+border-bottom:1px solid #eee;
+
+vertical-align:middle;
+
+}
+
+tr:hover{
+
+background:#f8fbff;
+
+}
+
+.badge{
+
+padding:6px 12px;
+
+border-radius:20px;
+
+font-size:13px;
+
+font-weight:bold;
+
+display:inline-block;
+
+}
+
+.active{
+
+background:#dcfce7;
+
+color:#166534;
+
+}
+
+.inactive{
+
+background:#fee2e2;
+
+color:#991b1b;
+
+}
+
+.actions{
+
+display:flex;
+
+gap:8px;
+
+flex-wrap:wrap;
+
+}
+
+.action{
+
+width:36px;
+
+height:36px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+border-radius:8px;
+
+color:white;
+
+text-decoration:none;
+
+}
+
+.view{
+
+background:#2563eb;
+
+}
+
+.edit{
+
+background:#0ea5e9;
+
+}
+
+.activate{
+
+background:#16a34a;
+
+}
+
+.deactivate{
+
+background:#f59e0b;
+
+}
+
+.copy{
+
+background:#8b5cf6;
+
+}
+
+.logs{
+
+background:#6366f1;
+
+}
+
+.delete{
+
+background:#dc2626;
+
+}
+
+.empty{
+
+padding:60px;
+
+text-align:center;
+
+color:#777;
+
+}
+
+@media(max-width:900px){
+
+table{
+
+display:block;
+
+overflow-x:auto;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h2>
+
+<i class="fas fa-file-signature"></i>
+
+Consent Management
+
+</h2>
+
+<a
+
+href="{{ url_for('create_consent') }}"
+
+class="btn">
+
+<i class="fas fa-plus"></i>
+
+New Consent
+
+</a>
+
+<a
+
+href="{{ url_for('manage_schools') }}"
+
+class="btn">
+
+<i class="fas fa-back"></i>
+
+To Dashboard
+
+</a>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<h3>Total Consents</h3>
+
+<h1>{{ consents|length }}</h1>
+
+</div>
+
+<div class="card">
+
+<h3>Active</h3>
+
+<h1>
+
+{{ consents|selectattr('active')|list|length }}
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>Inactive</h3>
+
+<h1>
+
+{{ consents|rejectattr('active')|list|length }}
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>Consent Logs</h3>
+
+<h1>
+
+{{ total_logs|default(0) }}
+
+</h1>
+
+</div>
+
+</div>
+
+<form
+
+method="GET"
+
+class="filters">
+
+<input
+
+type="text"
+
+name="search"
+
+placeholder="Search title..."
+
+value="{{ search }}">
+
+<select name="target">
+
+<option value="">All Targets</option>
+
+<option value="Student">Student</option>
+
+<option value="Parent">Parent</option>
+
+<option value="SchoolAdmin">SchoolAdmin</option>
+
+</select>
+
+<select name="status">
+
+<option value="">All Status</option>
+
+<option value="active">Active</option>
+
+<option value="inactive">Inactive</option>
+
+</select>
+
+<button>
+
+<i class="fas fa-search"></i>
+
+Search
+
+</button>
+
+</form>
+
+<div class="table-wrapper">
+
+{% if consents %}
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Title</th>
+
+<th>Version</th>
+
+<th>Target</th>
+
+<th>Status</th>
+
+<th>Effective Date</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for consent in consents %}
+
+<tr>
+
+<td>
+
+<strong>{{ consent.title }}</strong>
+
+</td>
+
+<td>
+
+{{ consent.version }}
+
+</td>
+
+<td>
+
+{{ consent.target }}
+
+</td>
+
+<td>
+
+    {% if consent.active %}
+
+        <span class="badge active">
+            Active
+        </span>
+
+    {% else %}
+
+        <span class="badge inactive">
+            Inactive
+        </span>
+
+    {% endif %}
+
+</td>
+<td>
+
+<div class="actions">
+
+<a href="{{ url_for('admin_consent_details', consent_id=consent.id) }}" class="action view" title="View">
+    <i class="fas fa-eye"></i>
+</a>
+
+<a href="{{ url_for('edit_consent', id=consent.id) }}" class="action edit" title="Edit">
+    <i class="fas fa-edit"></i>
+</a>
+
+{% if consent.active %}
+
+<a href="{{ url_for('deactivate_consent', id=consent.id) }}" class="action deactivate" title="Deactivate">
+    <i class="fas fa-ban"></i>
+</a>
+
+{% else %}
+
+<a href="{{ url_for('activate_consent', id=consent.id) }}" class="action activate" title="Activate">
+    <i class="fas fa-check"></i>
+</a>
+
+{% endif %}
+
+<a href="{{ url_for('duplicate_consent', id=consent.id) }}" class="action copy" title="Duplicate">
+    <i class="fas fa-copy"></i>
+</a>
+
+<a href="{{ url_for('consent_logs') }}" class="action logs" title="Logs">
+    <i class="fas fa-history"></i>
+</a>
+
+<a href="{{ url_for('delete_consent', id=consent.id) }}"
+   class="action delete"
+   title="Delete"
+   onclick="return confirm('Delete this consent?');">
+
+    <i class="fas fa-trash"></i>
+
+</a>
+
+</div>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<div class="empty">
+
+<h2>No consent records found.</h2>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</body>
+
+</html>
