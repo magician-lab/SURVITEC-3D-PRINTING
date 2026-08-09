@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, abort
-from models import db, School, SchoolAdmin, Student, Subscription, SurveySchool, Material, Result, SystemAdmin,Survey,StudentAnswer, SurveyAttempt, MaterialSchool, Question, Consent, ConsentLog, ConsentToken
+from models import db, School, SchoolAdmin, Student, SurveySchool, Material, Result, SystemAdmin,Survey,StudentAnswer, SurveyAttempt, MaterialSchool, Question, Consent, ConsentLog, ConsentToken
 from werkzeug.security import generate_password_hash, check_password_hash
 from decimal import Decimal
 from datetime import datetime, date, timedelta
