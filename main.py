@@ -297,14 +297,41 @@ def system_login():
 
 
 
+
+from functools import wraps
+from flask import (
+    session,
+    redirect,
+    url_for,
+    flash
+)
+
+
 def system_admin_required(f):
 
     @wraps(f)
     def wrapper(*args, **kwargs):
 
-        system_admin_id = session.get("system_admin_id")
+        # ==========================================
+        # GET SYSTEM ADMIN ID FROM SESSION
+        # ==========================================
 
-        # No system login
+        system_admin_id = session.get(
+            "system_admin_id"
+        )
+
+        print(
+            "SYSTEM ADMIN SESSION ID:",
+            system_admin_id,
+            "TYPE:",
+            type(system_admin_id)
+        )
+
+
+        # ==========================================
+        # NO SYSTEM LOGIN
+        # ==========================================
+
         if not system_admin_id:
 
             flash(
@@ -312,26 +339,94 @@ def system_admin_required(f):
                 "danger"
             )
 
-            return redirect(url_for("system_login"))
+            return redirect(
+                url_for("system_login")
+            )
 
-        # Verify admin still exists
-        admin = SystemAdmin.query.get(system_admin_id)
+
+        # ==========================================
+        # UUID VALIDATION
+        # ==========================================
+
+        if not isinstance(
+            system_admin_id,
+            str
+        ):
+
+            print(
+                "WARNING: System admin session contains "
+                "a non-string ID:",
+                system_admin_id
+            )
+
+            session.pop(
+                "system_admin_id",
+                None
+            )
+
+            session.pop(
+                "system_admin_logged_in",
+                None
+            )
+
+            flash(
+                "Your system administrator session is invalid. Please login again.",
+                "warning"
+            )
+
+            return redirect(
+                url_for("system_login")
+            )
+
+
+        # ==========================================
+        # FIND ADMIN USING UUID
+        # ==========================================
+
+        admin = SystemAdmin.query.get(
+            system_admin_id
+        )
+
+
+        # ==========================================
+        # ADMIN NO LONGER EXISTS
+        # ==========================================
 
         if admin is None:
 
-            session.pop("system_admin_id", None)
-            session.pop("system_admin_logged_in", None)
+            session.pop(
+                "system_admin_id",
+                None
+            )
+
+            session.pop(
+                "system_admin_logged_in",
+                None
+            )
 
             flash(
                 "System administrator session expired.",
                 "warning"
             )
 
-            return redirect(url_for("system_login"))
+            return redirect(
+                url_for("system_login")
+            )
 
-        return f(*args, **kwargs)
+
+        # ==========================================
+        # ATTACH ADMIN TO REQUEST
+        # ==========================================
+
+        return f(
+            *args,
+            **kwargs
+        )
+
 
     return wrapper
+
+
 
 def shared_access(f):
     @wraps(f)
