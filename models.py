@@ -7,8 +7,6 @@ from datetime import (
     date
 )
 
-from decimal import Decimal
-
 import pytz
 import uuid
 
@@ -28,6 +26,14 @@ kenya_tz = pytz.timezone("Africa/Nairobi")
 
 
 # ==========================================================
+# UUID HELPER
+# ==========================================================
+
+def generate_uuid():
+    return str(uuid.uuid4())
+
+
+# ==========================================================
 # SCHOOL
 # ==========================================================
 
@@ -38,7 +44,7 @@ class School(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
     school_code = db.Column(
@@ -82,13 +88,15 @@ class Student(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # School.id is String(36)
     school_id = db.Column(
         db.String(36),
-        db.ForeignKey("schools.id"),
+        db.ForeignKey(
+            "schools.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -148,10 +156,12 @@ class Student(db.Model):
         db.DateTime
     )
 
-    # Consent.id is String(36)
     last_consent_id = db.Column(
         db.String(36),
-        db.ForeignKey("consents.id"),
+        db.ForeignKey(
+            "consents.id",
+            ondelete="SET NULL"
+        ),
         nullable=True
     )
 
@@ -172,7 +182,8 @@ class Student(db.Model):
     )
 
     consent = db.relationship(
-        "Consent"
+        "Consent",
+        foreign_keys=[last_consent_id]
     )
 
     __table_args__ = (
@@ -195,7 +206,7 @@ class SystemAdmin(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
     username = db.Column(
@@ -240,13 +251,15 @@ class SchoolAdmin(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # School.id is String(36)
     school_id = db.Column(
         db.String(36),
-        db.ForeignKey("schools.id"),
+        db.ForeignKey(
+            "schools.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -286,10 +299,12 @@ class SchoolAdmin(db.Model):
         db.DateTime
     )
 
-    # Consent.id is String(36)
     last_consent_id = db.Column(
         db.String(36),
-        db.ForeignKey("consents.id"),
+        db.ForeignKey(
+            "consents.id",
+            ondelete="SET NULL"
+        ),
         nullable=True
     )
 
@@ -310,7 +325,8 @@ class SchoolAdmin(db.Model):
     )
 
     consent = db.relationship(
-        "Consent"
+        "Consent",
+        foreign_keys=[last_consent_id]
     )
 
 
@@ -325,7 +341,7 @@ class Material(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
     title = db.Column(
@@ -385,20 +401,24 @@ class MaterialSchool(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Material.id is String(36)
     material_id = db.Column(
         db.String(36),
-        db.ForeignKey("materials.id"),
+        db.ForeignKey(
+            "materials.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # School.id is String(36)
     school_id = db.Column(
         db.String(36),
-        db.ForeignKey("schools.id"),
+        db.ForeignKey(
+            "schools.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -423,7 +443,7 @@ class Survey(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
     title = db.Column(
@@ -499,20 +519,24 @@ class SurveySchool(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Survey.id is String(36)
     survey_id = db.Column(
         db.String(36),
-        db.ForeignKey("surveys.id"),
+        db.ForeignKey(
+            "surveys.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # School.id is String(36)
     school_id = db.Column(
         db.String(36),
-        db.ForeignKey("schools.id"),
+        db.ForeignKey(
+            "schools.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -537,13 +561,15 @@ class Question(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Survey.id is String(36)
     survey_id = db.Column(
         db.String(36),
-        db.ForeignKey("surveys.id"),
+        db.ForeignKey(
+            "surveys.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -603,20 +629,24 @@ class SurveyAttempt(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Student.id is String(36)
     student_id = db.Column(
         db.String(36),
-        db.ForeignKey("students.id"),
+        db.ForeignKey(
+            "students.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # Survey.id is String(36)
     survey_id = db.Column(
         db.String(36),
-        db.ForeignKey("surveys.id"),
+        db.ForeignKey(
+            "surveys.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -662,27 +692,33 @@ class StudentAnswer(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Student.id is String(36)
     student_id = db.Column(
         db.String(36),
-        db.ForeignKey("students.id"),
+        db.ForeignKey(
+            "students.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # Survey.id is String(36)
     survey_id = db.Column(
         db.String(36),
-        db.ForeignKey("surveys.id"),
+        db.ForeignKey(
+            "surveys.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # Question.id is String(36)
     question_id = db.Column(
         db.String(36),
-        db.ForeignKey("questions.id"),
+        db.ForeignKey(
+            "questions.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -722,20 +758,24 @@ class Result(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Student.id is String(36)
     student_id = db.Column(
         db.String(36),
-        db.ForeignKey("students.id"),
+        db.ForeignKey(
+            "students.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # Survey.id is String(36)
     survey_id = db.Column(
         db.String(36),
-        db.ForeignKey("surveys.id"),
+        db.ForeignKey(
+            "surveys.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -777,7 +817,44 @@ class Result(db.Model):
     )
 
 
+# ==========================================================
+# SUBSCRIPTION
+# ==========================================================
 
+class Subscription(db.Model):
+
+    __tablename__ = "subscriptions"
+
+    id = db.Column(
+        db.String(36),
+        primary_key=True,
+        default=generate_uuid
+    )
+
+    school_id = db.Column(
+        db.String(36),
+        db.ForeignKey(
+            "schools.id",
+            ondelete="CASCADE"
+        ),
+        nullable=True
+    )
+
+    amount = db.Column(
+        db.Float
+    )
+
+    start_date = db.Column(
+        db.Date
+    )
+
+    expiry_date = db.Column(
+        db.Date
+    )
+
+    status = db.Column(
+        db.String(20)
+    )
 
 
 # ==========================================================
@@ -791,7 +868,7 @@ class Consent(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
     title = db.Column(
@@ -846,34 +923,41 @@ class ConsentLog(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Consent.id is String(36)
     consent_id = db.Column(
         db.String(36),
-        db.ForeignKey("consents.id"),
+        db.ForeignKey(
+            "consents.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # Student.id is String(36)
     student_id = db.Column(
         db.String(36),
-        db.ForeignKey("students.id"),
+        db.ForeignKey(
+            "students.id",
+            ondelete="SET NULL"
+        ),
         nullable=True
     )
 
-    # School.id is String(36)
     school_id = db.Column(
         db.String(36),
-        db.ForeignKey("schools.id"),
+        db.ForeignKey(
+            "schools.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
-    # Polymorphic/general user reference.
-    # This is intentionally NOT a foreign key.
+    # Generic/polymorphic user reference.
+    # No FK because user_type determines the entity.
     user_id = db.Column(
-        db.Integer
+        db.String(36),
+        nullable=True
     )
 
     user_type = db.Column(
@@ -1005,20 +1089,22 @@ class ConsentToken(db.Model):
     id = db.Column(
         db.String(36),
         primary_key=True,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
     token = db.Column(
         db.String(120),
         unique=True,
         nullable=False,
-        default=lambda: str(uuid.uuid4())
+        default=generate_uuid
     )
 
-    # Consent.id is String(36)
     consent_id = db.Column(
         db.String(36),
-        db.ForeignKey("consents.id"),
+        db.ForeignKey(
+            "consents.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
@@ -1027,10 +1113,9 @@ class ConsentToken(db.Model):
         nullable=False
     )
 
-    # Polymorphic/general user reference.
-    # This is intentionally NOT a foreign key.
+    # Generic/polymorphic user reference.
     user_id = db.Column(
-        db.Integer,
+        db.String(36),
         nullable=False
     )
 
