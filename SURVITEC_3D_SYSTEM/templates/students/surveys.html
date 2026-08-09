@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Available Surveys</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+}
+
+.container{
+width:95%;
+max-width:1200px;
+margin:30px auto;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.header h2{
+color:#1e3a8a;
+}
+
+.btn{
+padding:10px 20px;
+background:#2563eb;
+color:white;
+text-decoration:none;
+border-radius:8px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+th{
+background:#2563eb;
+color:white;
+padding:15px;
+}
+
+td{
+padding:15px;
+border-bottom:1px solid #eee;
+text-align:center;
+}
+
+tr:hover{
+background:#f8fbff;
+}
+
+.badge{
+padding:6px 12px;
+border-radius:20px;
+color:white;
+font-size:13px;
+}
+
+.available{
+background:#16a34a;
+}
+
+.completed{
+background:#6b7280;
+}
+
+.start{
+
+display:inline-block;
+
+padding:8px 18px;
+
+background:#16a34a;
+
+color:white;
+
+text-decoration:none;
+
+border-radius:6px;
+
+font-weight:600;
+
+}
+
+.done{
+
+display:inline-block;
+
+padding:8px 18px;
+
+background:#9ca3af;
+
+color:white;
+
+border-radius:6px;
+
+cursor:not-allowed;
+
+font-weight:600;
+
+}
+
+.empty{
+background:white;
+padding:40px;
+text-align:center;
+border-radius:10px;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h2>📝 Available Surveys</h2>
+
+<a href="{{ url_for('student_dashboard') }}" class="btn">
+
+← Dashboard
+
+</a>
+
+</div>
+
+{% if survey_data %}
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Title</th>
+
+<th>Subject</th>
+
+<th>Grade</th>
+
+<th>Duration</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for item in survey_data %}
+
+<tr>
+
+<td>{{ item.survey.title }}</td>
+
+<td>{{ item.survey.subject }}</td>
+
+<td>{{ item.survey.grade }}</td>
+
+<td>{{ item.survey.duration_minutes }} mins</td>
+
+<td>
+
+{% if item.completed %}
+
+<span class="badge completed">
+
+Completed
+
+</span>
+
+{% else %}
+
+<span class="badge available">
+
+Available
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+{% if item.completed %}
+
+<span class="done">
+
+✔ Completed
+
+</span>
+
+{% else %}
+
+<a
+
+href="{{ url_for('start_survey', id=item.survey.id) }}"
+
+class="start">
+
+▶ Start Survey
+
+</a>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<div class="empty">
+
+<h3>No Surveys Available</h3>
+
+<p>
+
+There are currently no surveys assigned to your class.
+
+</p>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>
