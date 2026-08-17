@@ -135,9 +135,9 @@ with app.app_context():
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'magicdevelopers9@gmail.com'
-app.config['MAIL_PASSWORD'] = 'gsjj xlew exen bcot'
-app.config['MAIL_DEFAULT_SENDER'] = 'SURVITEC 3D <magicdevelopers9@gmail.com>'
+app.config['MAIL_USERNAME'] = 'survitec3d@gmail.com'
+app.config['MAIL_PASSWORD'] = 'sqzw dhef ysgg mjdt'
+app.config['MAIL_DEFAULT_SENDER'] = 'SURVITEC 3D <survitec3d@gmail.com>'
 
 mail = Mail(app)
 
