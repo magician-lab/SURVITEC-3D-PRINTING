@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+instance/
+*.db
+reset_db.py
+verify_db.py
