@@ -1509,18 +1509,24 @@ def manage_school_admins():
 
         token = generate_school_admin_consent(admin)
 
-        send_school_admin_consent_email(
+        if token:
 
-            admin,
+            send_school_admin_consent_email(
+                admin,
+                token
+            )
 
-            token
+            flash(
+                "School admin created. Consent email sent.",
+                "success"
+            )
 
-        )
+        else:
 
-        flash(
-            "School admin created successfully",
-            "success"
-        )
+            flash(
+                "School admin created. Consent email could not be sent (no active consent configured).",
+                "warning"
+            )
 
         return redirect(
             url_for(
@@ -5955,62 +5961,20 @@ def request_new_consent(user_type, user_id):
     # -----------------------------
     if user_type == "Student":
 
-        age = (
-
-            datetime.now(kenya_tz).date()
-
-            - user.date_of_birth
-
-        ).days // 365
-
-        if age < 18:
-
-            send_student_consent_email(
-
-                user.parent_email,
-
-                token.token
-
-            )
-
-        else:
-
-            send_student_consent_email(
-
-                user.email,
-
-                token.token
-
-            )
+        send_student_consent_email(user, token)
 
     else:
 
-        send_school_admin_consent_email(
-
-            user.email,
-
-            token.token
-
-        )
-
-    token.status = "Sent"
-
-    db.session.commit()
+        send_school_admin_consent_email(user, token)
 
     flash(
-
         "A new consent link has been sent.",
-
         "success"
-
     )
 
     return render_template(
-
         "consent_link_sent.html",
-
         token=token
-
     )
 
 @app.route("/system/consent/logs")
