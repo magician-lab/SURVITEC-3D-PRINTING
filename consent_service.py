@@ -5,9 +5,7 @@ from datetime import datetime, timedelta, date
 import pytz
 
 from flask import url_for
-from flask_mail import Message
-
-from mail_config import mail
+from email_service import send_email_safe
 
 from models import (
     db,
@@ -857,25 +855,11 @@ def send_parent_consent_email(
     </html>
     """
 
-
-    msg = Message(
-
-        subject=subject,
-
-        recipients=[
-            student.parent_email
-        ]
-
+    send_email_safe(
+        student.parent_email,
+        subject,
+        html=html
     )
-
-
-    msg.html = html
-
-
-    mail.send(
-        msg
-    )
-
 
     return True
 
@@ -1118,29 +1102,12 @@ def send_school_admin_consent_email(admin, token):
     </html>
     """
 
-
-    msg = Message(
-
-        subject=subject,
-
-        recipients=[
-            admin.email
-        ]
-
+    send_email_safe(
+        admin.email,
+        subject,
+        html=html
     )
 
-
-    msg.html = html
-
-
-    mail.send(
-        msg
-    )
-
-
-    print(
-        "School Admin consent email sent successfully."
-    )
-
+    print("School Admin consent email queued.")
 
     return True

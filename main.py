@@ -3,7 +3,7 @@ from models import db, School, SchoolAdmin, Student, SurveySchool, Material, Res
 from werkzeug.security import generate_password_hash, check_password_hash
 from decimal import Decimal
 from datetime import datetime, date, timedelta
-from flask_mail import Mail, Message
+from flask_mail import Mail
 from functools import wraps
 from sqlalchemy import extract, func
 from sqlalchemy.exc import IntegrityError
@@ -14,21 +14,21 @@ from flask import send_from_directory
 import uuid
 from flask import send_file
 from consent_service import generate_student_consent, generate_school_admin_consent, determine_student_category, calculate_age, create_consent_token, get_active_consent, send_parent_consent_email
-from email_service import send_school_admin_consent_email, send_student_consent_email
+from email_service import send_school_admin_consent_email, send_student_consent_email, send_email_safe
 from dotenv import load_dotenv
 load_dotenv()
 import os
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'supersecretkey123'
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'supersecretkey123')
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'survitec3d@gmail.com'
-app.config['MAIL_PASSWORD'] = 'ccbg lauz xxha obhp'
-app.config['MAIL_DEFAULT_SENDER'] = 'SURVITEC 3D <survitec3d@gmail.com>'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'survitec3d@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'ccbg lauz xxha obhp')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'SURVITEC 3D <survitec3d@gmail.com>')
 
 from mail_config import mail
 mail.init_app(app)
@@ -98,53 +98,21 @@ def allowed_file(filename):
 with app.app_context():
     db.create_all()
 
-    # =====================================================
-    # MIGRATE: Add OTP columns if missing (SQLite safe)
-    # =====================================================
-    from sqlalchemy import text, inspect
-    inspector = inspect(db.engine)
-
-    for table_name in ["students", "school_admins"]:
-        columns = [c["name"] for c in inspector.get_columns(table_name)]
-        if "otp_code" not in columns:
-            db.session.execute(text(f"ALTER TABLE [{table_name}] ADD COLUMN otp_code VARCHAR(10)"))
-        if "otp_expiration" not in columns:
-            db.session.execute(text(f"ALTER TABLE [{table_name}] ADD COLUMN otp_expiration DATETIME"))
-    db.session.commit()
-
-    # =====================================================
-    # CHECK IF ADMIN EXISTS
-    # =====================================================
-
     existing_admin = SystemAdmin.query.filter_by(
         username="admin"
     ).first()
 
-    # =====================================================
-    # CREATE DEFAULT ADMIN ONLY ONCE
-    # =====================================================
-
     if not existing_admin:
-
         admin = SystemAdmin(
-
             username="admin",
-
             email="kephakimathikanyola@gmail.com",
-
             password=generate_password_hash("admin123"),
-
         )
-
         db.session.add(admin)
-
         db.session.commit()
-
-        print("✅ Default admin created")
-
+        print("Default admin created")
     else:
-
-        print("✅ Admin already exists")
+        print("Admin already exists")
 
 
 def kenya_datetime(dt):
@@ -721,18 +689,9 @@ def forgot():
             # SEND EMAIL
             # =================================================
 
-            msg = Message(
-                subject="Password Reset OTP",
-                recipients=[email]
-            )
+            otp_body = f"Your OTP is: {otp}\n\nIt expires in 10 minutes.\n\nIf you did not request this, ignore this email."
 
-            msg.body = f"""
-Your OTP is: {otp}
-
-It expires in 10 minutes.
-"""
-
-            mail.send(msg)
+            send_email_safe(email, "Password Reset OTP - SURVITEC 3D", body=otp_body)
 
             session["reset_email"] = email
 
@@ -896,12 +855,8 @@ def school_forgot():
             user.otp_expiration = datetime.utcnow() + timedelta(minutes=10)
             db.session.commit()
 
-            msg = Message(
-                subject="Password Reset OTP - SURVITEC 3D",
-                recipients=[email]
-            )
-            msg.body = f"Your OTP is: {otp}\n\nIt expires in 10 minutes.\n\nIf you did not request this, ignore this email."
-            mail.send(msg)
+            otp_body = f"Your OTP is: {otp}\n\nIt expires in 10 minutes.\n\nIf you did not request this, ignore this email."
+            send_email_safe(email, "Password Reset OTP - SURVITEC 3D", body=otp_body)
 
             session["school_reset_email"] = email
 
@@ -1008,12 +963,8 @@ def student_forgot():
             student.otp_expiration = datetime.utcnow() + timedelta(minutes=10)
             db.session.commit()
 
-            msg = Message(
-                subject="Password Reset OTP - SURVITEC 3D",
-                recipients=[email]
-            )
-            msg.body = f"Your OTP is: {otp}\n\nIt expires in 10 minutes.\n\nIf you did not request this, ignore this email."
-            mail.send(msg)
+            otp_body = f"Your OTP is: {otp}\n\nIt expires in 10 minutes.\n\nIf you did not request this, ignore this email."
+            send_email_safe(email, "Password Reset OTP - SURVITEC 3D", body=otp_body)
 
             session["student_reset_email"] = email
             session["student_reset_school"] = school_code
