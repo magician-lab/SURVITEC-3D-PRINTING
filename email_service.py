@@ -6,8 +6,6 @@ from datetime import datetime
 import pytz
 import traceback
 
-from consent_service import build_consent_link
-
 kenya_tz = pytz.timezone("Africa/Nairobi")
 
 
@@ -38,6 +36,7 @@ def send_email_safe(recipient, subject, body=None, html=None):
 
 
 def send_student_consent_email(student, token):
+    from consent_service import build_consent_link
     link = build_consent_link(token)
     html = render_template(
         "student_consent.html",
@@ -53,6 +52,7 @@ def send_student_consent_email(student, token):
 
 
 def send_school_admin_consent_email(admin, token):
+    from consent_service import build_consent_link
     link = build_consent_link(token)
     html = render_template(
         "admin_consent.html",
