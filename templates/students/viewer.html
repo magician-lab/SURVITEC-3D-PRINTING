@@ -845,24 +845,10 @@ text-align:center;
         style="display:none;"
     >
 
-        <i
-            class="fas fa-file-word"
-            style="font-size:90px;color:#2563eb;"
-        ></i>
-
-        <h2>
-
-            Preview not available
-
-        </h2>
-
-        <p>
-
-            This file type cannot be previewed inside your browser.
-
-            Click Download to open it using Microsoft Office or another compatible application.
-
-        </p>
+        <iframe
+            id="officeFrame"
+            style="width:100%;height:calc(100vh - 300px);border:none;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.15);"
+        ></iframe>
 
     </div>
 
@@ -912,6 +898,16 @@ text-align:center;
 
 >
 
+<input
+
+    type="hidden"
+
+    id="materialId"
+
+    value="{{ material.id }}"
+
+>
+
 <!-- ============================== -->
 <!-- PART C -->
 <!-- ============================== -->
@@ -930,6 +926,10 @@ const extension = document
 
 const contentUrl = document
 .getElementById("contentUrl")
+.value;
+
+const materialId = document
+.getElementById("materialId")
 .value;
 
 const pdfViewer =
@@ -1028,15 +1028,10 @@ else if(
 }
 
 else if(
-
     [
-
         "mp4",
-
         "webm",
-
         "ogg"
-
     ].includes(extension)
 
 ){
@@ -1051,7 +1046,13 @@ else{
 
     officeViewer.style.display="block";
 
-    pageIndicator.innerHTML="Preview unavailable";
+    pageIndicator.innerHTML="Document Preview";
+
+    const publicUrl = window.location.origin + "/public/material/" + materialId + "?token=survitec_viewer_" + materialId;
+
+    const googleDocsUrl = "https://docs.google.com/gview?url=" + encodeURIComponent(publicUrl) + "&embedded=true";
+
+    document.getElementById("officeFrame").src = googleDocsUrl;
 
 }
 

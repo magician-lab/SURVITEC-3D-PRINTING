@@ -176,6 +176,14 @@ class Student(db.Model):
         onupdate=lambda: datetime.now(kenya_tz)
     )
 
+    otp_code = db.Column(
+        db.String(10)
+    )
+
+    otp_expiration = db.Column(
+        db.DateTime
+    )
+
     school = db.relationship(
         "School",
         backref="students"
@@ -317,6 +325,14 @@ class SchoolAdmin(db.Model):
         db.DateTime,
         default=lambda: datetime.now(kenya_tz),
         onupdate=lambda: datetime.now(kenya_tz)
+    )
+
+    otp_code = db.Column(
+        db.String(10)
+    )
+
+    otp_expiration = db.Column(
+        db.DateTime
     )
 
     school = db.relationship(

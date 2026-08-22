@@ -450,11 +450,84 @@ font-size:15px;
 
 }
 
+/* ================= MOBILE MENU ================= */
+
+.menu-toggle{
+
+display:none;
+
+position:fixed;
+
+top:20px;
+
+left:20px;
+
+z-index:2000;
+
+width:45px;
+
+height:45px;
+
+border-radius:12px;
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+font-size:20px;
+
+cursor:pointer;
+
+box-shadow:0 4px 15px rgba(37,99,235,.4);
+
+}
+
+.overlay{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:rgba(0,0,0,.5);
+
+z-index:999;
+
+}
+
+@media(max-width:800px){
+
+.menu-toggle{display:flex;justify-content:center;align-items:center}
+
+.sidebar{transform:translateX(-100%);transition:.3s;z-index:1000}
+
+.sidebar.open{transform:translateX(0)}
+
+.overlay.show{display:block}
+
+.main{margin-left:0;padding:25px 15px;padding-top:75px}
+
+.topbar{flex-direction:column;align-items:flex-start;gap:10px}
+
+.cards{grid-template-columns:1fr}
+
+.bottom-row{grid-template-columns:1fr}
+
+}
+
 </style>
 
 </head>
 
 <body>
+
+<button class="menu-toggle" onclick="toggleSidebar()">
+<i class="fas fa-bars"></i>
+</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
 <!-- ================= SIDEBAR ================= -->
 
@@ -986,6 +1059,13 @@ No materials available.
 </div>
 
 </div>
+
+<script>
+function toggleSidebar(){
+    document.querySelector('.sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+}
+</script>
 
 </body>
 

@@ -15,30 +15,30 @@ import uuid
 from flask import send_file
 from consent_service import generate_student_consent, generate_school_admin_consent, determine_student_category, calculate_age, create_consent_token, get_active_consent, send_parent_consent_email
 from email_service import send_school_admin_consent_email, send_student_consent_email
-app = Flask(__name__)
-from mail_config import mail
-
-mail.init_app(app)
 from dotenv import load_dotenv
-
-
-
 load_dotenv()
-
 import os
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app = Flask(__name__)
 
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-
-    "pool_pre_ping": True,
-
-    "pool_recycle": 300
-
-}
 app.config['SECRET_KEY'] = 'supersecretkey123'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'survitec3d@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ccbg lauz xxha obhp'
+app.config['MAIL_DEFAULT_SENDER'] = 'SURVITEC 3D <survitec3d@gmail.com>'
+
+from mail_config import mail
+mail.init_app(app)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300
+}
 
 db.init_app(app)
 UPLOAD_FOLDER = "uploads/materials"
@@ -97,6 +97,21 @@ def allowed_file(filename):
 
 with app.app_context():
     db.create_all()
+
+    # =====================================================
+    # MIGRATE: Add OTP columns if missing (SQLite safe)
+    # =====================================================
+    from sqlalchemy import text, inspect
+    inspector = inspect(db.engine)
+
+    for table_name in ["students", "school_admins"]:
+        columns = [c["name"] for c in inspector.get_columns(table_name)]
+        if "otp_code" not in columns:
+            db.session.execute(text(f"ALTER TABLE [{table_name}] ADD COLUMN otp_code VARCHAR(10)"))
+        if "otp_expiration" not in columns:
+            db.session.execute(text(f"ALTER TABLE [{table_name}] ADD COLUMN otp_expiration DATETIME"))
+    db.session.commit()
+
     # =====================================================
     # CHECK IF ADMIN EXISTS
     # =====================================================
@@ -131,17 +146,6 @@ with app.app_context():
 
         print("✅ Admin already exists")
 
-
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True   # Switch this to True
-app.config['MAIL_USE_SSL'] = False  # Switch this to False
-app.config['MAIL_USERNAME'] = 'survitec3d@gmail.com'
-app.config['MAIL_PASSWORD'] = 'ccbg lauz xxha obhp'
-app.config['MAIL_DEFAULT_SENDER'] = 'SURVITEC 3D <survitec3d@gmail.com>'
-
-
-mail = Mail(app)
 
 def kenya_datetime(dt):
 
@@ -870,6 +874,237 @@ def reset_password():
         return redirect(url_for("login"))
 
     return render_template("reset.html")
+
+
+# =========================================================
+# SCHOOL ADMIN FORGOT PASSWORD
+# =========================================================
+
+@app.route("/school/forgot", methods=["GET", "POST"])
+def school_forgot():
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip()
+
+        user = SchoolAdmin.query.filter_by(email=email).first()
+
+        if user:
+
+            otp = str(random.randint(100000, 999999))
+            user.otp_code = otp
+            user.otp_expiration = datetime.utcnow() + timedelta(minutes=10)
+            db.session.commit()
+
+            msg = Message(
+                subject="Password Reset OTP - SURVITEC 3D",
+                recipients=[email]
+            )
+            msg.body = f"Your OTP is: {otp}\n\nIt expires in 10 minutes.\n\nIf you did not request this, ignore this email."
+            mail.send(msg)
+
+            session["school_reset_email"] = email
+
+            flash("OTP sent to your email", "success")
+            return redirect(url_for("school_verify_otp"))
+
+        else:
+
+            flash("Email not found", "error")
+
+    return render_template("school_forgot.html")
+
+
+@app.route("/school/verify_otp", methods=["GET", "POST"])
+def school_verify_otp():
+
+    if request.method == "POST":
+
+        otp = request.form.get("otp")
+        email = session.get("school_reset_email")
+
+        if not email:
+            flash("Session expired", "error")
+            return redirect(url_for("school_forgot"))
+
+        user = SchoolAdmin.query.filter_by(email=email).first()
+
+        if user and user.otp_code == otp:
+
+            if datetime.utcnow() <= user.otp_expiration:
+                session["school_otp_verified"] = True
+                flash("OTP verified successfully", "success")
+                return redirect(url_for("school_reset_password"))
+            else:
+                flash("OTP expired", "error")
+        else:
+            flash("Invalid OTP", "error")
+
+    return render_template("school_verify_otp.html")
+
+
+@app.route("/school/reset_password", methods=["GET", "POST"])
+def school_reset_password():
+
+    if not session.get("school_otp_verified"):
+        return redirect(url_for("school_login"))
+
+    if request.method == "POST":
+
+        new_password = request.form.get("password")
+        email = session.get("school_reset_email")
+
+        if not email:
+            flash("Session expired", "error")
+            return redirect(url_for("school_forgot"))
+
+        user = SchoolAdmin.query.filter_by(email=email).first()
+
+        if not user:
+            flash("User not found", "error")
+            return redirect(url_for("school_forgot"))
+
+        user.password_hash = generate_password_hash(new_password)
+        user.otp_code = None
+        user.otp_expiration = None
+        db.session.commit()
+
+        session.clear()
+        flash("Password reset successful", "success")
+        return redirect(url_for("school_login"))
+
+    return render_template("school_reset.html")
+
+
+# =========================================================
+# STUDENT FORGOT PASSWORD
+# =========================================================
+
+@app.route("/student/forgot", methods=["GET", "POST"])
+def student_forgot():
+
+    if request.method == "POST":
+
+        school_code = request.form.get("school_code", "").strip()
+        admission_no = request.form.get("admission_no", "").strip()
+        email = request.form.get("email", "").strip()
+
+        school = School.query.filter_by(school_code=school_code).first()
+
+        if not school:
+            flash("Invalid school code", "error")
+            return redirect(url_for("student_forgot"))
+
+        student = Student.query.filter_by(
+            school_id=school.id,
+            admission_no=admission_no,
+            email=email
+        ).first()
+
+        if student:
+
+            otp = str(random.randint(100000, 999999))
+            student.otp_code = otp
+            student.otp_expiration = datetime.utcnow() + timedelta(minutes=10)
+            db.session.commit()
+
+            msg = Message(
+                subject="Password Reset OTP - SURVITEC 3D",
+                recipients=[email]
+            )
+            msg.body = f"Your OTP is: {otp}\n\nIt expires in 10 minutes.\n\nIf you did not request this, ignore this email."
+            mail.send(msg)
+
+            session["student_reset_email"] = email
+            session["student_reset_school"] = school_code
+            session["student_reset_admission"] = admission_no
+
+            flash("OTP sent to your email", "success")
+            return redirect(url_for("student_verify_otp"))
+
+        else:
+
+            flash("No student found with these details", "error")
+
+    return render_template("student_forgot.html")
+
+
+@app.route("/student/verify_otp", methods=["GET", "POST"])
+def student_verify_otp():
+
+    if request.method == "POST":
+
+        otp = request.form.get("otp")
+        email = session.get("student_reset_email")
+
+        if not email:
+            flash("Session expired", "error")
+            return redirect(url_for("student_forgot"))
+
+        school_code = session.get("student_reset_school")
+        admission_no = session.get("student_reset_admission")
+
+        school = School.query.filter_by(school_code=school_code).first()
+
+        student = Student.query.filter_by(
+            school_id=school.id,
+            admission_no=admission_no,
+            email=email
+        ).first()
+
+        if student and student.otp_code == otp:
+
+            if datetime.utcnow() <= student.otp_expiration:
+                session["student_otp_verified"] = True
+                flash("OTP verified successfully", "success")
+                return redirect(url_for("student_reset_password"))
+            else:
+                flash("OTP expired", "error")
+        else:
+            flash("Invalid OTP", "error")
+
+    return render_template("student_verify_otp.html")
+
+
+@app.route("/student/reset_password", methods=["GET", "POST"])
+def student_reset_password():
+
+    if not session.get("student_otp_verified"):
+        return redirect(url_for("student_login"))
+
+    if request.method == "POST":
+
+        new_password = request.form.get("password")
+        email = session.get("student_reset_email")
+        school_code = session.get("student_reset_school")
+        admission_no = session.get("student_reset_admission")
+
+        if not email:
+            flash("Session expired", "error")
+            return redirect(url_for("student_forgot"))
+
+        school = School.query.filter_by(school_code=school_code).first()
+        student = Student.query.filter_by(
+            school_id=school.id,
+            admission_no=admission_no,
+            email=email
+        ).first()
+
+        if not student:
+            flash("User not found", "error")
+            return redirect(url_for("student_forgot"))
+
+        student.password_hash = generate_password_hash(new_password)
+        student.otp_code = None
+        student.otp_expiration = None
+        db.session.commit()
+
+        session.clear()
+        flash("Password reset successful", "success")
+        return redirect(url_for("student_login"))
+
+    return render_template("student_reset.html")
+
 
 @app.route("/admin/logout")
 def admin_logout():
@@ -3215,6 +3450,57 @@ def view_material(id):
     )
 
 #############################################################
+# PUBLIC FILE SERVE (for Google Docs Viewer / external embeds)
+#############################################################
+
+@app.route("/public/material/<id>")
+def public_material_content(id):
+
+    token = request.args.get("token", "")
+    valid_token = "survitec_viewer_" + id
+
+    if token != valid_token:
+        abort(403)
+
+    material = Material.query.get_or_404(id)
+
+    stored = material.file_path.replace("\\", "/")
+
+    if "/" in stored:
+        file_path = os.path.join(app.root_path, stored)
+    else:
+        file_path = os.path.join(
+            app.root_path,
+            app.config["UPLOAD_FOLDER"],
+            stored
+        )
+
+    if not os.path.isfile(file_path):
+        abort(404)
+
+    mime_types = {
+        "pdf": "application/pdf",
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+        "gif": "image/gif",
+        "mp4": "video/mp4",
+        "doc": "application/msword",
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "ppt": "application/vnd.ms-powerpoint",
+        "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "xls": "application/vnd.ms-excel",
+        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "zip": "application/zip",
+    }
+
+    ext = material.file_name.rsplit(".", 1)[-1].lower() if "." in material.file_name else ""
+    content_type = mime_types.get(ext, "application/octet-stream")
+
+    return send_file(file_path, mimetype=content_type, as_attachment=False)
+
+
+#############################################################
 # STREAM MATERIAL
 #############################################################
 
@@ -3253,9 +3539,28 @@ def material_content(id):
 
         abort(404)
 
+    mime_types = {
+        "pdf": "application/pdf",
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+        "gif": "image/gif",
+        "mp4": "video/mp4",
+        "doc": "application/msword",
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "ppt": "application/vnd.ms-powerpoint",
+        "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "xls": "application/vnd.ms-excel",
+        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "zip": "application/zip",
+    }
+
+    ext = material.file_name.rsplit(".", 1)[-1].lower() if "." in material.file_name else ""
+    content_type = mime_types.get(ext, "application/octet-stream")
+
     return send_file(
         file_path,
-        download_name=material.file_name,
+        mimetype=content_type,
         as_attachment=False
     )
 
